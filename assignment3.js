@@ -20,8 +20,6 @@ export class Assignment3 extends Scene {
             sphere2: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(2),
             sphere1: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(1),
             circle: new defs.Regular_2D_Polygon(1, 15),
-            // TODO:  Fill in as many additional shape instances as needed in this key/value table.
-            //        (Requirement 1)
         };
 
         // *** Materials
@@ -31,10 +29,12 @@ export class Assignment3 extends Scene {
             test2: new Material(new Gouraud_Shader(),
                 { ambient: .4, diffusivity: .6, color: hex_color("#992828") }),
             ring: new Material(new Ring_Shader()),
-            // TODO:  Fill in as many additional material objects as needed in this key/value table.
-            //        (Requirement 4)
             sun_mat: new Material(new defs.Phong_Shader(),
                 { ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#ff0000") }),
+            planet_1: new Material(new defs.Phong_Shader(), //diffuse only
+                { ambient: 0, diffusivity: 1, specularity: 0, color: hex_color("#ffffff") }),
+            planet_2: new Material(new defs.Phong_Shader(), //max specular, low diffuse
+                { ambient: 0, diffusivity: 0.4, specularity: 1, color: hex_color("#80FFFF") })
         }
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
@@ -65,13 +65,6 @@ export class Assignment3 extends Scene {
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, .1, 1000);
 
-
-        // TODO: Lighting (Requirement 2)
-        const light_position = vec4(0, 5, 5, 1);
-        // The parameters of the Light are: position, color, size
-        program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000)];
-
-        // TODO:  Fill in matrix operations and drawing code to draw the solar system scene (Requirements 3 and 4)
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         let model_transform = Mat4.identity();
 
@@ -85,19 +78,10 @@ export class Assignment3 extends Scene {
         const scale_radius = 2 * ((Math.sin(t * Math.PI / 5) + 1) / 2) + 1; // Normalize to range [1, 3]
         const scale_sway = Mat4.scale(scale_radius, scale_radius, scale_radius);
 
-        this.shapes.sphere4.draw(context, program_state, scale_sway, this.materials.sun_mat.override({ color: color_sway }));
-        // this is my sun ^
 
         // 2. Point Light src 
-        /*      - same color as sun
-                - located in center of sun 
-                - size 10**n where n = current sun radius  (** <- exponent in ja)
-                - lights size is changing, not brightness, should see outer planers darken ore when sun shrinks
-        */
-
-
-
-
+        const light_position = vec4(0, 0, 0, 1); // The parameters of the Light are: position, color, size
+        program_state.lights = [new Light(light_position, color_sway, 10 ** scale_radius)]
 
         // 3. Four Orbiting Planets
         /*      - radius = 1
@@ -105,8 +89,6 @@ export class Assignment3 extends Scene {
                 -  each orbit after is 4 units farther
                 - each farther planet revolves at a slower rate than previous
                 - leave ambient lighting to default 0
-                - Planet 1: 
-                    - gray, 2 subdivisions, flat shaded, diffuse only
                 - Planet 2:
                     - swampy green-blue (#80FFFF), 3 subdivisions, max specular, low diffuse
                     - apply gouraud shading to it every second, but phong every odd second
@@ -117,8 +99,14 @@ export class Assignment3 extends Scene {
                     - give ring the same color as planet and set materials ambient only for now
         */
 
+        //Sun
+        this.shapes.sphere4.draw(context, program_state, scale_sway, this.materials.sun_mat.override({ color: color_sway }));
 
+        //PLanet 1 - Gray 
+        this.shapes.sphere2.draw(context, program_state, model_transform.times(Mat4.translation(5, 0, 0)), this.materials.planet_1);
 
+        //Planet 2 - Swampy
+        this.shapes.sphere3.draw(context, program_state, model_transform.times(Mat4.translation(9, 0, 0)), this.materials.planet_2);
     }
 }
 
@@ -148,7 +136,7 @@ class Gouraud_Shader extends Shader {
         varying vec3 N, vertex_worldspace;
         // ***** PHONG SHADING HAPPENS HERE: *****                                       
         vec3 phong_model_lights( vec3 N, vec3 vertex_worldspace ){                                        
-            // phong_model_lights():  Add up the lights' contributions.
+            phong_model_lights():  Add up the lights' contributions.
             vec3 E = normalize( camera_center - vertex_worldspace );
             vec3 result = vec3( 0.0 );
             for(int i = 0; i < N_LIGHTS; i++){
