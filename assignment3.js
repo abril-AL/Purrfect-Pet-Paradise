@@ -33,8 +33,12 @@ export class Assignment3 extends Scene {
                 { ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#ff0000") }),
             planet_1: new Material(new defs.Phong_Shader(), //diffuse only
                 { ambient: 0, diffusivity: 1, specularity: 0, color: hex_color("#ffffff") }),
-            planet_2: new Material(new defs.Phong_Shader(), //max specular, low diffuse
-                { ambient: 0, diffusivity: 0.4, specularity: 1, color: hex_color("#80FFFF") })
+            planet_2_Phong: new Material(new defs.Phong_Shader(), //max specular, low diffuse
+                { ambient: 0, diffusivity: 0.6, specularity: 1, color: hex_color("#80FFFF") }),
+            planet_2_Gourard: new Material(new Gouraud_Shader(), //max specular, low diffuse
+                { ambient: 0, diffusivity: 0.6, specularity: 1, color: hex_color("#80FFFF") }),
+            planet_3: new Material(new defs.Phong_Shader(), //diffuse only
+                { ambient: 0, diffusivity: 1, specularity: 1, color: hex_color("#B08040") }),
         }
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
@@ -99,14 +103,33 @@ export class Assignment3 extends Scene {
                     - give ring the same color as planet and set materials ambient only for now
         */
 
+        // Rotation matrix for planets orbiting the sun
+        const angle = t * Math.PI;
+        const p1_rotation = Mat4.rotation(angle / 4, 0, 1, 0);
+        const p2_rotation = Mat4.rotation(angle / 6, 0, 1, 0);
+        const p3_rotation = Mat4.rotation(angle / 8, 0, 1, 0);
+
         //Sun
         this.shapes.sphere4.draw(context, program_state, scale_sway, this.materials.sun_mat.override({ color: color_sway }));
 
         //PLanet 1 - Gray 
-        this.shapes.sphere2.draw(context, program_state, model_transform.times(Mat4.translation(5, 0, 0)), this.materials.planet_1);
+        this.shapes.sphere2.draw(context, program_state, p1_rotation.times(Mat4.translation(5, 0, 0)), this.materials.planet_1);
 
         //Planet 2 - Swampy
-        this.shapes.sphere3.draw(context, program_state, model_transform.times(Mat4.translation(9, 0, 0)), this.materials.planet_2);
+        if (Math.floor(t) % 2 === 0) { // even
+            this.shapes.sphere3.draw(context, program_state, p2_rotation.times(Mat4.translation(9, 0, 0)), this.materials.planet_2_Gourard);
+        } else { // odd
+            this.shapes.sphere3.draw(context, program_state, p2_rotation.times(Mat4.translation(9, 0, 0)), this.materials.planet_2_Phong);
+        }
+
+        //The planet must have a ring. You can use 
+        //the provided torus shape, scaled flatter (reduced z axis scale). Give the ring the same 
+        //color as the planet and set the material ambient only (for now)
+
+        //Planet 3 - Muddy Brown-Orange
+        //this.shapes.sphere3.draw(context, program_state, p3_rotation)
+
+
     }
 }
 
@@ -134,9 +157,14 @@ class Gouraud_Shader extends Shader {
         // on to the next phase (fragment shader), then interpolated per-fragment, weighted by the
         // pixel fragment's proximity to each of the 3 vertices (barycentric interpolation).
         varying vec3 N, vertex_worldspace;
+
+        ////
+        varying vec4 VERTEX_COLOR;  // New variable to pass the color
+        ////
+
         // ***** PHONG SHADING HAPPENS HERE: *****                                       
         vec3 phong_model_lights( vec3 N, vec3 vertex_worldspace ){                                        
-            phong_model_lights():  Add up the lights' contributions.
+            // phong_model_lights():  Add up the lights' contributions.
             vec3 E = normalize( camera_center - vertex_worldspace );
             vec3 result = vec3( 0.0 );
             for(int i = 0; i < N_LIGHTS; i++){
@@ -175,12 +203,17 @@ class Gouraud_Shader extends Shader {
             uniform mat4 model_transform;
             uniform mat4 projection_camera_model_transform;
     
-            void main(){                                                                   
+        void main(){                                                                   
                 // The vertex's final resting place (in NDCS):
                 gl_Position = projection_camera_model_transform * vec4( position, 1.0 );
+
                 // The final normal vector in screen space.
                 N = normalize( mat3( model_transform ) * normal / squared_scale);
                 vertex_worldspace = ( model_transform * vec4( position, 1.0 ) ).xyz;
+                                
+                VERTEX_COLOR = vec4(shape_color.xyz * ambient, shape_color.w); // <- here
+                VERTEX_COLOR.xyz += phong_model_lights(N, vertex_worldspace);
+                
             } `;
     }
 
@@ -189,11 +222,16 @@ class Gouraud_Shader extends Shader {
         // A fragment is a pixel that's overlapped by the current triangle.
         // Fragments affect the final image or get discarded due to depth.
         return this.shared_glsl_code() + `
-            void main(){                                                           
+            void main(){      
+                
+                // Use the interpolated color value from the vertex shader
+                gl_FragColor = VERTEX_COLOR; // <- here
+                return;
+
                 // Compute an initial (ambient) color:
-                gl_FragColor = vec4( shape_color.xyz * ambient, shape_color.w );
+                //gl_FragColor = vec4( shape_color.xyz * ambient, shape_color.w );
                 // Compute the final color with contributions from lights:
-                gl_FragColor.xyz += phong_model_lights( normalize( N ), vertex_worldspace );
+                //gl_FragColor.xyz += phong_model_lights( normalize( N ), vertex_worldspace );
             } `;
     }
 
