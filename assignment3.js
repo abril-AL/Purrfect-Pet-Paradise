@@ -1,4 +1,4 @@
-import {defs, tiny} from './examples/common.js';
+import { defs, tiny } from './examples/common.js';
 
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene,
@@ -13,7 +13,12 @@ export class Assignment3 extends Scene {
         this.shapes = {
             torus: new defs.Torus(15, 15),
             torus2: new defs.Torus(3, 15),
-            sphere: new defs.Subdivision_Sphere(4),
+            sphere4: new defs.Subdivision_Sphere(4),
+            sphere3: new defs.Subdivision_Sphere(3),
+            //sphere4: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(4),
+            //sphere2: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(3),
+            sphere2: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(2),
+            sphere1: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(1),
             circle: new defs.Regular_2D_Polygon(1, 15),
             // TODO:  Fill in as many additional shape instances as needed in this key/value table.
             //        (Requirement 1)
@@ -22,12 +27,14 @@ export class Assignment3 extends Scene {
         // *** Materials
         this.materials = {
             test: new Material(new defs.Phong_Shader(),
-                {ambient: .4, diffusivity: .6, color: hex_color("#ffffff")}),
+                { ambient: .4, diffusivity: .6, color: hex_color("#ffffff") }),
             test2: new Material(new Gouraud_Shader(),
-                {ambient: .4, diffusivity: .6, color: hex_color("#992828")}),
+                { ambient: .4, diffusivity: .6, color: hex_color("#992828") }),
             ring: new Material(new Ring_Shader()),
             // TODO:  Fill in as many additional material objects as needed in this key/value table.
             //        (Requirement 4)
+            sun_mat: new Material(new defs.Phong_Shader(),
+                { ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#ff0000") }),
         }
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
@@ -58,8 +65,6 @@ export class Assignment3 extends Scene {
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, .1, 1000);
 
-        // TODO: Create Planets (Requirement 1)
-        // this.shapes.[XXX].draw([XXX]) // <--example
 
         // TODO: Lighting (Requirement 2)
         const light_position = vec4(0, 5, 5, 1);
@@ -68,10 +73,52 @@ export class Assignment3 extends Scene {
 
         // TODO:  Fill in matrix operations and drawing code to draw the solar system scene (Requirements 3 and 4)
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
-        const yellow = hex_color("#fac91a");
         let model_transform = Mat4.identity();
 
-        this.shapes.torus.draw(context, program_state, model_transform, this.materials.test.override({color: yellow}));
+
+        // 1. Spherical Sun at the origin, subdiv 4, max ambient, swells 1-3, shrinks 3-1 over 10 sec, fades from red to white
+        const sun_time_period = 10; //seconds
+
+        const color_factor = (Math.sin(t * Math.PI / (sun_time_period / 2)) + 1) / 2; // Normalize to range [0, 1]
+        const color_sway = tiny.color(1, color_factor, color_factor, 1); // Red to white transition
+
+        const scale_radius = 2 * ((Math.sin(t * Math.PI / 5) + 1) / 2) + 1; // Normalize to range [1, 3]
+        const scale_sway = Mat4.scale(scale_radius, scale_radius, scale_radius);
+
+        this.shapes.sphere4.draw(context, program_state, scale_sway, this.materials.sun_mat.override({ color: color_sway }));
+        // this is my sun ^
+
+        // 2. Point Light src 
+        /*      - same color as sun
+                - located in center of sun 
+                - size 10**n where n = current sun radius  (** <- exponent in ja)
+                - lights size is changing, not brightness, should see outer planers darken ore when sun shrinks
+        */
+
+
+
+
+
+        // 3. Four Orbiting Planets
+        /*      - radius = 1
+                - smallest is 5 units away from sun
+                -  each orbit after is 4 units farther
+                - each farther planet revolves at a slower rate than previous
+                - leave ambient lighting to default 0
+                - Planet 1: 
+                    - gray, 2 subdivisions, flat shaded, diffuse only
+                - Planet 2:
+                    - swampy green-blue (#80FFFF), 3 subdivisions, max specular, low diffuse
+                    - apply gouraud shading to it every second, but phong every odd second
+                - Planet 3:
+                    - muddy brown-orange (#B08040), 4 subdicisions, max diffuse and specular
+                    - can optionally wobble on its rotation
+                    - must have a ring ( can use provided torus shape, scalled flatter (reduced z axis scale))
+                    - give ring the same color as planet and set materials ambient only for now
+        */
+
+
+
     }
 }
 
@@ -213,7 +260,7 @@ class Gouraud_Shader extends Shader {
         // within this function, one data field at a time, to fully initialize the shader for a draw.
 
         // Fill in any missing fields in the Material object with custom defaults for this shader:
-        const defaults = {color: color(0, 0, 0, 1), ambient: 0, diffusivity: 1, specularity: 1, smoothness: 40};
+        const defaults = { color: color(0, 0, 0, 1), ambient: 0, diffusivity: 1, specularity: 1, smoothness: 40 };
         material = Object.assign({}, defaults, material);
 
         this.send_material(context, gpu_addresses, material);
