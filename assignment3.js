@@ -29,16 +29,18 @@ export class Assignment3 extends Scene {
             ring: new Material(new Ring_Shader()),
             sun_mat: new Material(new defs.Phong_Shader(),
                 { ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#ff0000") }),
-            planet_1: new Material(new defs.Phong_Shader(), //diffuse only
+            planet_1_mat: new Material(new defs.Phong_Shader(), //diffuse only
                 { ambient: 0, diffusivity: 1, specularity: 0, color: hex_color("#ffffff") }),
             planet_2_Phong: new Material(new defs.Phong_Shader(), //max specular, low diffuse
                 { ambient: 0, diffusivity: 0.6, specularity: 1, color: hex_color("#80FFFF") }),
             planet_2_Gourard: new Material(new Gouraud_Shader(), //max specular, low diffuse
                 { ambient: 0, diffusivity: 0.6, specularity: 1, color: hex_color("#80FFFF") }),
-            planet_3: new Material(new defs.Phong_Shader(), //diffuse only
+            planet_3_mat: new Material(new defs.Phong_Shader(), //diffuse only
                 { ambient: 0, diffusivity: 1, specularity: 1, color: hex_color("#B08040") }),
-            planet_4: new Material(new defs.Phong_Shader(), // high specular
-                { ambient: 0.1, diffusivity: 0.1, specularity: 0.95, color: hex_color("#ADD8E6") })//remove ambient and diff later
+            planet_4_mat: new Material(new defs.Phong_Shader(), // high specular
+                { ambient: 0, diffusivity: 0.4, specularity: 0.95, color: hex_color("#0000ff") }),
+            planet_4_moon: new Material(new defs.Phong_Shader(),
+                { ambient: 0.3, diffusivity: 0.7, specularity: 0.2, color: hex_color("#ffffff") })
         }
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
@@ -88,33 +90,23 @@ export class Assignment3 extends Scene {
         program_state.lights = [new Light(light_position, color_sway, 10 ** scale_radius)] //change back to 10 after testing
 
         // 3. Four Orbiting Planets
-        /*      - radius = 1
-                - smallest is 5 units away from sun
-                -  each orbit after is 4 units farther
-                - each farther planet revolves at a slower rate than previous
-                - leave ambient lighting to default 0
-                - Planet 2:
-                    - swampy green-blue (#80FFFF), 3 subdivisions, max specular, low diffuse
-                    - apply gouraud shading to it every second, but phong every odd second
-                - Planet 3:
-                    - muddy brown-orange (#B08040), 4 subdicisions, max diffuse and specular
-                    - can optionally wobble on its rotation
-                    - must have a ring ( can use provided torus shape, scalled flatter (reduced z axis scale))
-                    - give ring the same color as planet and set materials ambient only for now
-        */
 
         // Rotation matrix for planets orbiting the sun
         const angle = t * Math.PI;
-        const p1_rotation = Mat4.rotation(angle / 3, 0, 1, 0).times(Mat4.translation(5, 0, 0));
-        const p2_rotation = Mat4.rotation(angle / 4.5, 0, 1, 0).times(Mat4.translation(9, 0, 0));
-        const p3_rotation = Mat4.rotation(angle / 6, 0, 1, 0).times(Mat4.translation(13, 0, 0));
-        const p4_rotation = Mat4.rotation(angle / 7.5, 0, 1, 0);
+        const p1_rotation = Mat4.rotation(angle / 4, 0, 1, 0).times(Mat4.translation(5, 0, 0));
+        const p2_rotation = Mat4.rotation(angle / 5.5, 0, 1, 0).times(Mat4.translation(9, 0, 0));
+        const p3_rotation = Mat4.rotation(angle / 7, 0, 1, 0).times(Mat4.translation(13, 0, 0));
+        const p4_rotation = Mat4.rotation(angle / 8.5, 0, 1, 0).times(Mat4.translation(17, 0, 0));
+        const p4_moon_rotation = p4_rotation
+            .times(Mat4.rotation(angle / 4, 0, 1, 0))
+            .times(Mat4.translation(1.8, 0, 0))
+            .times(Mat4.scale(.65, .65, .65));
 
         //Sun
         this.shapes.sphere4.draw(context, program_state, scale_sway, this.materials.sun_mat.override({ color: color_sway }));
 
         //PLanet 1 - Gray 
-        this.shapes.sphere2.draw(context, program_state, p1_rotation, this.materials.planet_1);
+        this.shapes.sphere2.draw(context, program_state, p1_rotation, this.materials.planet_1_mat);
 
         //Planet 2 - Swampy
         if (Math.floor(t) % 2 === 0) { // even
@@ -130,14 +122,25 @@ export class Assignment3 extends Scene {
             .times(Mat4.rotation(t * Math.PI / 6, 0, 0, 1)) // Rotate 
             .times(Mat4.scale(2.4, 2.4, 0.2)); // flattern and scale up radius
 
-        this.shapes.sphere3.draw(context, program_state, p3_rotation, this.materials.planet_3);
+        this.shapes.sphere3.draw(context, program_state, p3_rotation, this.materials.planet_3_mat);
         this.shapes.torus.draw(context, program_state, ring_transform, this.materials.ring);
 
         //Planet 4 - Soft Light Blue with Moon
-        /* Add a moon for this planet. 
-        The moon has 1 subdivision, with flat shading, any material, and a small orbital distance around the planet.  */
-        this.shapes.sphere4.draw(context, program_state, p4_rotation.times(Mat4.translation(17, 0, 0)), this.materials.planet_4)
+        this.shapes.sphere4.draw(context, program_state, p4_rotation, this.materials.planet_4_mat);
+        this.shapes.sphere1.draw(context, program_state, p4_moon_rotation, this.materials.planet_4_moon);
 
+        // For camera:
+        this.planet_1 = Mat4.inverse(p1_rotation.times(Mat4.translation(0, 0, 5)));
+        this.planet_2 = Mat4.inverse(p2_rotation.times(Mat4.translation(0, 0, 5)));
+        this.planet_3 = Mat4.inverse(p3_rotation.times(Mat4.translation(0, 0, 5)));
+        this.planet_4 = Mat4.inverse(p4_rotation.times(Mat4.translation(0, 0, 5)));
+        this.moon = Mat4.inverse(p4_moon_rotation.times(Mat4.translation(0, 0, 5)));
+
+        if (this.attached != undefined) {
+            program_state.camera_inverse = this.attached().map((x, i) => Vector.from(program_state.camera_inverse[i]).mix(x, 0.1));
+        } else {
+            //program_state.set_camera(this.initial_camera_location);
+        }
 
     }
 }
