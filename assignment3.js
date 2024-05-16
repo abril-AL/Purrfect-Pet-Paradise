@@ -12,11 +12,9 @@ export class Assignment3 extends Scene {
         // At the beginning of our program, load one of each of these shape definitions onto the GPU.
         this.shapes = {
             torus: new defs.Torus(15, 15),
-            torus2: new defs.Torus(3, 15),
+            torus2: new defs.Torus(4, 14),
             sphere4: new defs.Subdivision_Sphere(4),
             sphere3: new defs.Subdivision_Sphere(3),
-            //sphere4: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(4),
-            //sphere2: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(3),
             sphere2: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(2),
             sphere1: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(1),
             circle: new defs.Regular_2D_Polygon(1, 15),
@@ -85,7 +83,7 @@ export class Assignment3 extends Scene {
 
         // 2. Point Light src 
         const light_position = vec4(0, 0, 0, 1); // The parameters of the Light are: position, color, size
-        program_state.lights = [new Light(light_position, color_sway, 10 ** scale_radius)]
+        program_state.lights = [new Light(light_position, color_sway, 100000000 ** scale_radius)] //change back to 10 after testing
 
         // 3. Four Orbiting Planets
         /*      - radius = 1
@@ -105,9 +103,9 @@ export class Assignment3 extends Scene {
 
         // Rotation matrix for planets orbiting the sun
         const angle = t * Math.PI;
-        const p1_rotation = Mat4.rotation(angle / 4, 0, 1, 0);
-        const p2_rotation = Mat4.rotation(angle / 6, 0, 1, 0);
-        const p3_rotation = Mat4.rotation(angle / 8, 0, 1, 0);
+        const p1_rotation = Mat4.rotation(angle / 3, 0, 1, 0);
+        const p2_rotation = Mat4.rotation(angle / 5, 0, 1, 0);
+        const p3_rotation = Mat4.rotation(angle / 7, 0, 1, 0);
 
         //Sun
         this.shapes.sphere4.draw(context, program_state, scale_sway, this.materials.sun_mat.override({ color: color_sway }));
@@ -122,13 +120,14 @@ export class Assignment3 extends Scene {
             this.shapes.sphere3.draw(context, program_state, p2_rotation.times(Mat4.translation(9, 0, 0)), this.materials.planet_2_Phong);
         }
 
-        //The planet must have a ring. You can use 
-        //the provided torus shape, scaled flatter (reduced z axis scale). Give the ring the same 
-        //color as the planet and set the material ambient only (for now)
-
         //Planet 3 - Muddy Brown-Orange
-        //this.shapes.sphere3.draw(context, program_state, p3_rotation)
+        let p3_matrix_combo = p3_rotation.times(Mat4.translation(13, 0, 0));
+        const ring_transform = p3_matrix_combo
+            //.times(Mat4.rotation(Math.PI / 2, 0, 1, 0)) // Rotate 90 degrees about z-axis
+            .times(Mat4.scale(2.5, 2.5, 0.2)); // Flatten the torus
 
+        this.shapes.sphere3.draw(context, program_state, p3_matrix_combo, this.materials.planet_3);
+        this.shapes.torus2.draw(context, program_state, ring_transform, this.materials.planet_3);
 
     }
 }
