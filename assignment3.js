@@ -12,7 +12,7 @@ export class Assignment3 extends Scene {
         // At the beginning of our program, load one of each of these shape definitions onto the GPU.
         this.shapes = {
             torus: new defs.Torus(15, 15),
-            torus2: new defs.Torus(4, 14),
+            torus2: new defs.Torus(3, 10),
             sphere4: new defs.Subdivision_Sphere(4),
             sphere3: new defs.Subdivision_Sphere(3),
             sphere2: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(2),
@@ -37,6 +37,8 @@ export class Assignment3 extends Scene {
                 { ambient: 0, diffusivity: 0.6, specularity: 1, color: hex_color("#80FFFF") }),
             planet_3: new Material(new defs.Phong_Shader(), //diffuse only
                 { ambient: 0, diffusivity: 1, specularity: 1, color: hex_color("#B08040") }),
+            planet_4: new Material(new defs.Phong_Shader(), // high specular
+                { ambient: 0.1, diffusivity: 0.1, specularity: 0.95, color: hex_color("#ADD8E6") })//remove ambient and diff later
         }
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
@@ -83,7 +85,7 @@ export class Assignment3 extends Scene {
 
         // 2. Point Light src 
         const light_position = vec4(0, 0, 0, 1); // The parameters of the Light are: position, color, size
-        program_state.lights = [new Light(light_position, color_sway, 100000000 ** scale_radius)] //change back to 10 after testing
+        program_state.lights = [new Light(light_position, color_sway, 10 ** scale_radius)] //change back to 10 after testing
 
         // 3. Four Orbiting Planets
         /*      - radius = 1
@@ -103,31 +105,39 @@ export class Assignment3 extends Scene {
 
         // Rotation matrix for planets orbiting the sun
         const angle = t * Math.PI;
-        const p1_rotation = Mat4.rotation(angle / 3, 0, 1, 0);
-        const p2_rotation = Mat4.rotation(angle / 5, 0, 1, 0);
-        const p3_rotation = Mat4.rotation(angle / 7, 0, 1, 0);
+        const p1_rotation = Mat4.rotation(angle / 3, 0, 1, 0).times(Mat4.translation(5, 0, 0));
+        const p2_rotation = Mat4.rotation(angle / 4.5, 0, 1, 0).times(Mat4.translation(9, 0, 0));
+        const p3_rotation = Mat4.rotation(angle / 6, 0, 1, 0).times(Mat4.translation(13, 0, 0));
+        const p4_rotation = Mat4.rotation(angle / 7.5, 0, 1, 0);
 
         //Sun
         this.shapes.sphere4.draw(context, program_state, scale_sway, this.materials.sun_mat.override({ color: color_sway }));
 
         //PLanet 1 - Gray 
-        this.shapes.sphere2.draw(context, program_state, p1_rotation.times(Mat4.translation(5, 0, 0)), this.materials.planet_1);
+        this.shapes.sphere2.draw(context, program_state, p1_rotation, this.materials.planet_1);
 
         //Planet 2 - Swampy
         if (Math.floor(t) % 2 === 0) { // even
-            this.shapes.sphere3.draw(context, program_state, p2_rotation.times(Mat4.translation(9, 0, 0)), this.materials.planet_2_Gourard);
+            this.shapes.sphere3.draw(context, program_state, p2_rotation, this.materials.planet_2_Gourard);
         } else { // odd
-            this.shapes.sphere3.draw(context, program_state, p2_rotation.times(Mat4.translation(9, 0, 0)), this.materials.planet_2_Phong);
+            this.shapes.sphere3.draw(context, program_state, p2_rotation, this.materials.planet_2_Phong);
         }
 
         //Planet 3 - Muddy Brown-Orange
-        let p3_matrix_combo = p3_rotation.times(Mat4.translation(13, 0, 0));
-        const ring_transform = p3_matrix_combo
-            //.times(Mat4.rotation(Math.PI / 2, 0, 1, 0)) // Rotate 90 degrees about z-axis
-            .times(Mat4.scale(2.5, 2.5, 0.2)); // Flatten the torus
+        const ring_transform = p3_rotation
+            .times(Mat4.rotation(t * Math.PI / 4, 1, 0, 0)) // Rotate 
+            .times(Mat4.rotation(t * Math.PI / 8, 0, 1, 0)) // Rotate 
+            .times(Mat4.rotation(t * Math.PI / 6, 0, 0, 1)) // Rotate 
+            .times(Mat4.scale(2.4, 2.4, 0.2)); // flattern and scale up radius
 
-        this.shapes.sphere3.draw(context, program_state, p3_matrix_combo, this.materials.planet_3);
-        this.shapes.torus2.draw(context, program_state, ring_transform, this.materials.planet_3);
+        this.shapes.sphere3.draw(context, program_state, p3_rotation, this.materials.planet_3);
+        this.shapes.torus.draw(context, program_state, ring_transform, this.materials.ring);
+
+        //Planet 4 - Soft Light Blue with Moon
+        /* Add a moon for this planet. 
+        The moon has 1 subdivision, with flat shading, any material, and a small orbital distance around the planet.  */
+        this.shapes.sphere4.draw(context, program_state, p4_rotation.times(Mat4.translation(17, 0, 0)), this.materials.planet_4)
+
 
     }
 }
@@ -321,7 +331,9 @@ class Ring_Shader extends Shader {
         uniform mat4 projection_camera_model_transform;
         
         void main(){
-          
+          center = model_transform * vec4(0.0, 0.0, 0.0, 1.0);
+          point_position = model_transform * vec4(position, 1.0);
+          gl_Position = projection_camera_model_transform * vec4(position, 1.0);          
         }`;
     }
 
@@ -330,7 +342,8 @@ class Ring_Shader extends Shader {
         // TODO:  Complete the main function of the fragment shader (Extra Credit Part II).
         return this.shared_glsl_code() + `
         void main(){
-          
+            float scalar = sin(18.01 * distance(point_position.xyz, center.xyz));
+            gl_FragColor = scalar * vec4(0.6078, 0.3961, 0.098, 1.0);
         }`;
     }
 }
