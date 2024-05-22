@@ -1,3 +1,9 @@
+/* 
+Project will be built from assignment 3
+
+use code as reference
+*/
+
 import { defs, tiny } from './examples/common.js';
 
 const {
