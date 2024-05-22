@@ -171,7 +171,7 @@ export class Test_Data {
             donut: new defs.Torus(15, 15, [[0, 2], [0, 1]]),
             cone: new defs.Closed_Cone(4, 10, [[0, 2], [0, 1]]),
             capped: new defs.Capped_Cylinder(4, 12, [[0, 2], [0, 1]]),
-            ball: new defs.Subdivision_Sphere(3, [[0, 1], [0, 1]]),
+            ball: new defs.Subdivision_Sphere(4),
             cube: new defs.Cube(),
             prism: new (defs.Capped_Cylinder.prototype.make_flat_shaded_version())(10, 10, [[0, 2], [0, 1]]),
             gem: new (defs.Subdivision_Sphere.prototype.make_flat_shaded_version())(2),
@@ -187,7 +187,7 @@ export class Test_Data {
 }
 
 
-export class Inertia_Demo extends Simulation {
+/*export class Inertia_Demo extends Simulation {
     // ** Inertia_Demo** demonstration: This scene lets random initial momentums
     // carry several bodies until they fall due to gravity and bounce.
     constructor() {
@@ -224,6 +224,74 @@ export class Inertia_Demo extends Simulation {
         }
         // Delete bodies that stop or stray too far away:
         this.bodies = this.bodies.filter(b => b.center.norm() < 50 && b.linear_velocity.norm() > 2);
+    }
+
+    display(context, program_state) {
+        // display(): Draw everything else in the scene besides the moving bodies.
+        super.display(context, program_state);
+
+        if (!context.scratchpad.controls) {
+            this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
+            this.children.push(new defs.Program_State_Viewer());
+            program_state.set_camera(Mat4.translation(0, 0, -50));    // Locate the camera here (inverted matrix).
+        }
+        program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 500);
+        program_state.lights = [new Light(vec4(0, -5, -10, 1), color(1, 1, 1, 1), 100000)];
+        // Draw the ground:
+        this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
+                .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(50, 50, 1)),
+            this.material.override(this.data.textures.earth));
+    }
+
+    show_explanation(document_element) {
+        document_element.innerHTML += `<p>This demo lets random initial momentums carry bodies until they fall and bounce.  It shows a good way to do incremental movements, which are crucial for making objects look like they're moving on their own instead of following a pre-determined path.  Animated objects look more real when they have inertia and obey physical laws, instead of being driven by simple sinusoids or periodic functions.
+                                     </p><p>For each moving object, we need to store a model matrix somewhere that is permanent (such as inside of our class) so we can keep consulting it every frame.  As an example, for a bowling simulation, the ball and each pin would go into an array (including 11 total matrices).  We give the model transform matrix a \"velocity\" and track it over time, which is split up into linear and angular components.  Here the angular velocity is expressed as an Euler angle-axis pair so that we can scale the angular speed how we want it.
+                                     </p><p>The forward Euler method is used to advance the linear and angular velocities of each shape one time-step.  The velocities are not subject to any forces here, but just a downward acceleration.  Velocities are also constrained to not take any objects under the ground plane.
+                                     </p><p>This scene extends class Simulation, which carefully manages stepping simulation time for any scenes that subclass it.  It totally decouples the whole simulation from the frame rate, following the suggestions in the blog post <a href=\"https://gafferongames.com/post/fix_your_timestep/\" target=\"blank\">\"Fix Your Timestep\"</a> by Glenn Fielder.  Buttons allow you to speed up and slow down time to show that the simulation's answers do not change.</p>`;
+    }
+} */
+
+export class Inertia_Demo extends Simulation {
+    // ** Inertia_Demo** demonstration: This scene lets random initial momentums
+    // carry several bodies until they fall due to gravity and bounce.
+    constructor() {
+        super();
+        this.data = new Test_Data();
+        this.shapes = Object.assign({}, this.data.shapes);
+        this.shapes.square = new defs.Square();
+        this.ball = new defs.Subdivision_Sphere(4);
+        const shader = new defs.Fake_Bump_Map(1);
+        this.material = new Material(shader, {
+            color: color(.4, .8, .4, 1),
+            ambient: .4, texture: this.data.textures.stars
+        })
+    }
+
+    random_color() {
+        return this.material.override(color(.6, .6 * Math.random(), .6 * Math.random(), 1));
+    }
+
+    update_state(dt) {
+        // update_state():  Override the base time-stepping code to say what this particular
+        // scene should do to its bodies every frame -- including applying forces.
+        // Generate additional moving bodies if there ever aren't enough:
+        while (this.bodies.length < 1)
+            this.bodies.push(new Body(this.ball, this.random_color(), vec3(1, 1 + Math.random(), 1))
+                .emplace(Mat4.translation(0, 0, 0),
+                    vec3(0, -1, 0).times(3), 0));
+
+        for (let b of this.bodies) {
+            // Gravity on Earth, where 1 unit in world space = 1 meter:
+            b.linear_velocity[1] += dt * -9.8;
+            // If about to fall through floor, reverse y velocity:
+            if (b.center[1] < -8 && b.linear_velocity[1] < 0)
+                b.linear_velocity[1] *= -.8;
+        }
+        // Delete bodies that stop or stray too far away:
+        //this.bodies = this.bodies.filter(b => b.center.norm() < 50 && b.linear_velocity.norm() > 1/2);
+        if (this.bodies[0].linear_velocity[1] < 0.01 && this.bodies[0].center[1] < -7.99){
+            this.bodies[0].linear_velocity[1] = 0;
+        }
     }
 
     display(context, program_state) {
