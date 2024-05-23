@@ -4,7 +4,7 @@ const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Matrix, Mat4, Light, Shape, Material, Texture, Scene,
 } = tiny;
 
-class Cube extends Shape {it config --global user.name "John Smith"
+class Cube extends Shape {
     constructor() {
         super("position", "normal");
         this.arrays.position = Vector3.cast(
@@ -96,6 +96,7 @@ class Base_Scene extends Scene {
             'cat': new Cat(),
             sq_tile: new defs.Square(),
             cube_tile: new defs.Cube(),
+            sphere: new defs.Subdivision_Sphere(4),
         };
 
         const bump = new defs.Fake_Bump_Map(1);
@@ -104,9 +105,11 @@ class Base_Scene extends Scene {
             plastic: new Material(new defs.Phong_Shader(),
                 { ambient: .4, diffusivity: .6, color: hex_color("#ffffff") }),
             green_grass: new Material(bump,
-                {ambient: .5, texture: new Texture("assets/green-grass-512x512.jpg")}),
+                {ambient: .5, texture: new Texture("assets/green-grass-512x512.png")}),
             sky_blue: new Material(textured,
-                {ambient: .5, texture: new Texture("assets/simple_sky_blue.png")}),
+                {ambient: .5, texture: new Texture("assets/sky.png")}),
+            sun: new Material(textured,
+                {ambient: 1, texture: new Texture("assets/sun_softer.png")}),
         };
 
         this.white = new Material(new defs.Basic_Shader());
@@ -147,6 +150,7 @@ export class Project extends Base_Scene {
 
     display(context, program_state) {
         super.display(context, program_state);
+        const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         let model_transform = Mat4.identity();
 
         this.shapes.cat.draw(context, program_state, model_transform, this.materials.plastic);
@@ -180,6 +184,13 @@ export class Project extends Base_Scene {
         model_transform = Mat4.identity();
         model_transform = model_transform.times(Mat4.translation(100, 10, -50)).times(Mat4.scale(50, 50, 1));
         this.shapes.sq_tile.draw(context, program_state, model_transform, this.materials.sky_blue);
+
+        const sun_scale = 2 + 1 * (Math.sin(Math.PI * t / 5));
+        const sun_color_fraction = (sun_scale - 1) / 2; // Normalize between 0 and 1
+        const sun_color = color(1, sun_color_fraction, 0, 1); // Transition from red to yellow
+        let sun_transform = Mat4.identity();
+        sun_transform = sun_transform.times(Mat4.translation(-6, 6, 0));
+        this.shapes.sphere.draw(context, program_state, sun_transform, this.materials.sun.override({color: sun_color}));
 
     }
 }
