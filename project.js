@@ -1,10 +1,10 @@
 import { defs, tiny } from './examples/common.js';
 
 const {
-    Vector, Vector3, vec, vec3, vec4, color, hex_color, Matrix, Mat4, Light, Shape, Material, Scene,
+    Vector, Vector3, vec, vec3, vec4, color, hex_color, Matrix, Mat4, Light, Shape, Material, Texture, Scene,
 } = tiny;
 
-class Cube extends Shape {
+class Cube extends Shape {it config --global user.name "John Smith"
     constructor() {
         super("position", "normal");
         this.arrays.position = Vector3.cast(
@@ -67,7 +67,6 @@ class Cat extends Shape {
         this.back_right_leg = new Leg();
     }
 
-
     draw(context, program_state, model_transform, material) {
         // Front left leg
         let front_left_transform = model_transform.times(Mat4.translation(-2, 0, 2));
@@ -95,11 +94,19 @@ class Base_Scene extends Scene {
             'cube': new Cube(),
             'leg': new Leg(),
             'cat': new Cat(),
+            sq_tile: new defs.Square(),
+            cube_tile: new defs.Cube(),
         };
 
+        const bump = new defs.Fake_Bump_Map(1);
+        const textured = new defs.Textured_Phong(1);
         this.materials = {
             plastic: new Material(new defs.Phong_Shader(),
                 { ambient: .4, diffusivity: .6, color: hex_color("#ffffff") }),
+            green_grass: new Material(bump,
+                {ambient: .5, texture: new Texture("assets/green-grass-512x512.jpg")}),
+            sky_blue: new Material(textured,
+                {ambient: .5, texture: new Texture("assets/simple_sky_blue.png")}),
         };
 
         this.white = new Material(new defs.Basic_Shader());
@@ -143,5 +150,36 @@ export class Project extends Base_Scene {
         let model_transform = Mat4.identity();
 
         this.shapes.cat.draw(context, program_state, model_transform, this.materials.plastic);
+
+        // Center ground tile
+        model_transform = Mat4.identity();
+        model_transform = model_transform.times(Mat4.translation(0, -4, 0)).times(Mat4.scale(20, 1, 20));
+        this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.green_grass);
+
+        // Left ground tile
+        model_transform = Mat4.identity();
+        model_transform = model_transform.times(Mat4.translation(-40, -4, 0)).times(Mat4.scale(20, 1, 20));
+        this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.green_grass);
+
+        // Right ground tile
+        model_transform = Mat4.identity();
+        model_transform = model_transform.times(Mat4.translation(40, -4, 0)).times(Mat4.scale(20, 1, 20));
+        this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.green_grass);
+
+        // Center sky tile
+        model_transform = Mat4.identity();
+        model_transform = model_transform.times(Mat4.translation(0, 10, -50)).times(Mat4.scale(50, 50, 1));
+        this.shapes.sq_tile.draw(context, program_state, model_transform, this.materials.sky_blue);
+
+        // Left sky tiles
+        model_transform = Mat4.identity();
+        model_transform = model_transform.times(Mat4.translation(-100, 10, -50)).times(Mat4.scale(50, 50, 1));
+        this.shapes.sq_tile.draw(context, program_state, model_transform, this.materials.sky_blue);
+
+        // Right sky tiles
+        model_transform = Mat4.identity();
+        model_transform = model_transform.times(Mat4.translation(100, 10, -50)).times(Mat4.scale(50, 50, 1));
+        this.shapes.sq_tile.draw(context, program_state, model_transform, this.materials.sky_blue);
+
     }
 }
