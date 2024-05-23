@@ -1,85 +1,8 @@
 import { defs, tiny } from './examples/common.js';
-import {Collision_Demo, Simulation, Body} from "./examples/collisions-demo.js";
 
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Matrix, Mat4, Light, Shape, Material, Scene,
 } = tiny;
-
-class Plane extends Shape {
-    constructor() {
-        super("position", "normal");
-        this.arrays.position = Vector3.cast(
-            [-50, 0, -50], [-50, 0, 50], [50, 0, 50], [50, 0, -50]
-        );
-        this.arrays.normal = Vector3.cast(
-            [0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0]
-        );
-        this.indices.push(
-            0, 1, 2, 2, 3, 0
-        );
-    }
-}
-
-class ball_fall extends Simulation {
-    // ** Inertia_Demo** demonstration: This scene lets random initial momentums
-    // carry several bodies until they fall due to gravity and bounce.
-    constructor() {
-        super();
-        this.shapes.ball = new defs.Subdivision_Sphere(4)
-        this.shapes.plane = new Plane();
-        const shader = new defs.Fake_Bump_Map(1);
-        this.material = new Material(shader, {
-            color: color(.4, .8, .4, 1),
-            ambient: .4
-        })
-    }
-
-    update_state(dt) {
-        // update_state():  Override the base time-stepping code to say what this particular
-        // scene should do to its bodies every frame -- including applying forces.
-        // Generate additional moving bodies if there ever aren't enough:
-        while (this.bodies.length < 1)
-            this.bodies.push(new Body(this.shapes.ball, this.random_color(), vec3(1, 1 + Math.random(), 1))
-                .emplace(Mat4.translation(0, 5, 0),
-                    vec3(0, -1, 0).times(3), 0));
-
-        for (let b of this.bodies) {
-            // Gravity on Earth, where 1 unit in world space = 1 meter:
-            b.linear_velocity[1] += dt * -9.8;
-            // If about to fall through floor, reverse y velocity:
-            if (b.center[1] < 0 && b.linear_velocity[1] < 0)
-                b.linear_velocity[1] *= -.8;
-        }
-        // Delete bodies that stop or stray too far away:
-        //this.bodies = this.bodies.filter(b => b.center.norm() < 50 && b.linear_velocity.norm() > 1/2);
-        if (this.bodies[0].linear_velocity[1] < 0.01 && this.bodies[0].center[1] < 0.01){
-            this.bodies[0].linear_velocity[1] = 0;
-        }
-    }
-
-    display(context, program_state) {
-        // display(): Draw everything else in the scene besides the moving bodies.
-        super.display(context, program_state);
-
-        /*if (!context.scratchpad.controls) {
-            this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
-            this.children.push(new defs.Program_State_Viewer());
-            program_state.set_camera(Mat4.translation(0, 0, -50));    // Locate the camera here (inverted matrix).
-        }
-        program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 500);
-        program_state.lights = [new Light(vec4(0, -5, -10, 1), color(1, 1, 1, 1), 100000)];
-        // Draw the ground:
-        this.shapes.plane.draw(context, program_state, Mat4.translation(0, -10, 0)
-                .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(50, 50, 1)),
-            this.material.override(this.data.textures.earth));*/
-
-        this.shapes.cat.draw(context, program_state, model_transform, this.materials.plastic);
-        this.shapes.plane.draw(context, program_state, Mat4.translation(0, -3, 0)
-                .times(Mat4.scale(50, 50, 1)),
-            this.materials.plastic);
-    }
-}
-
 
 class Cube extends Shape {
     constructor() {
@@ -111,27 +34,156 @@ class Cube extends Shape {
     }
 }
 
-class Leg extends Shape {
+class small_Cube extends Shape {
     constructor() {
         super("position", "normal");
         this.arrays.position = Vector3.cast(
-            [-1, -3, 1], [1, -3, 1], [1, 3, 1], [-1, 3, 1], // Front face
-            [-1, -3, -1], [1, -3, -1], [1, 3, -1], [-1, 3, -1] // Back face
+            [-0.5, -0.5, 0.5], [0.5, -0.5, 0.5], [0.5, 0.5, 0.5], [-0.5, 0.5, 0.5], // Front face
+            [-0.5, -0.5, -0.5], [-0.5, 0.5, -0.5], [0.5, 0.5, -0.5], [0.5, -0.5, -0.5], // Back face
+            [-0.5, 0.5, -0.5], [-0.5, 0.5, 0.5], [0.5, 0.5, 0.5], [0.5, 0.5, -0.5], // Top face
+            [-0.5, -0.5, -0.5], [0.5, -0.5, -0.5], [0.5, -0.5, 0.5], [-0.5, -0.5, 0.5], // Bottom face
+            [0.5, -0.5, -0.5], [0.5, 0.5, -0.5], [0.5, 0.5, 0.5], [0.5, -0.5, 0.5], // Right face
+            [-0.5, -0.5, -0.5], [-0.5, -0.5, 0.5], [-0.5, 0.5, 0.5], [-0.5, 0.5, -0.5] // Left face
         );
         this.arrays.normal = Vector3.cast(
             [0, 0, 1], [0, 0, 1], [0, 0, 1], [0, 0, 1], // Front face
-            [0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1] // Back face
+            [0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1], // Back face
+            [0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0], // Top face
+            [0, -1, 0], [0, -1, 0], [0, -1, 0], [0, -1, 0], // Bottom face
+            [1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0], // Right face
+            [-1, 0, 0], [-1, 0, 0], [-1, 0, 0], [-1, 0, 0] // Left face
         );
         this.indices.push(
             0, 1, 2, 0, 2, 3, // Front face
             4, 5, 6, 4, 6, 7, // Back face
-            0, 4, 5, 0, 5, 1, // Left face
-            3, 2, 6, 3, 6, 7, // Right face
-            3, 7, 6, 3, 6, 2, // Top face
-            0, 1, 5, 0, 5, 4  // Bottom face
+            8, 9, 10, 8, 10, 11, // Top face
+            12, 13, 14, 12, 14, 15, // Bottom face
+            16, 17, 18, 16, 18, 19, // Right face
+            20, 21, 22, 20, 22, 23 // Left face
         );
     }
 }
+
+class Leg extends Shape {
+    constructor() {
+        super("position", "normal");
+        this.arrays.position = Vector3.cast(
+            [-1, -2, 1], [1, -2, 1], [1, 2, 1], [-1, 2, 1],
+            [-1, -2, -1], [-1, 2, -1], [1, 2, -1], [1, -2, -1],
+            [-1, 2, -1], [-1, 2, 1], [1, 2, 1], [1, 2, -1],
+            [-1, -2, -1], [1, -2, -1], [1, -2, 1], [-1, -2, 1],
+            [1, -2, -1], [1, 2, -1], [1, 2, 1], [1, -2, 1],
+            [-1, -2, -1], [-1, -2, 1], [-1, 2, 1], [-1, 2, -1]
+        );
+        this.arrays.normal = Vector3.cast(
+            [0, 0, 1], [0, 0, 1], [0, 0, 1], [0, 0, 1],
+            [0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1],
+            [0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0],
+            [0, -1, 0], [0, -1, 0], [0, -1, 0], [0, -1, 0],
+            [1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0],
+            [-1, 0, 0], [-1, 0, 0], [-1, 0, 0], [-1, 0, 0]
+        );
+        this.indices.push(
+            0, 1, 2, 0, 2, 3,
+            4, 5, 6, 4, 6, 7,
+            8, 9, 10, 8, 10, 11,
+            12, 13, 14, 12, 14, 15,
+            16, 17, 18, 16, 18, 19,
+            20, 21, 22, 20, 22, 23
+        );
+    }
+}
+
+class Body extends Shape {
+    constructor() {
+        super("position", "normal");
+        this.arrays.position = Vector3.cast(
+            [-2.5, -3, 8.5], [2.5, -3, 8.5], [2.5, 3, 8.5], [-2.5, 3, 8.5],
+            [-2.5, -3, -8.5], [-2.5, 3, -8.5], [2.5, 3, -8.5], [2.5, -3, -8.5],
+            [-2.5, 3, -8.5], [-2.5, 3, 8.5], [2.5, 3, 8.5], [2.5, 3, -8.5],
+            [-2.5, -3, -8.5], [2.5, -3, -8.5], [2.5, -3, 8.5], [-2.5, -3, 8.5],
+            [2.5, -3, -8.5], [2.5, 3, -8.5], [2.5, 3, 8.5], [2.5, -3, 8.5],
+            [-2.5, -3, -8.5], [-2.5, -3, 8.5], [-2.5, 3, 8.5], [-2.5, 3, -8.5]
+        );
+        this.arrays.normal = Vector3.cast(
+            [0, 0, 1], [0, 0, 1], [0, 0, 1], [0, 0, 1],
+            [0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1],
+            [0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0],
+            [0, -1, 0], [0, -1, 0], [0, -1, 0], [0, -1, 0],
+            [1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0],
+            [-1, 0, 0], [-1, 0, 0], [-1, 0, 0], [-1, 0, 0]
+        );
+        this.indices.push(
+            0, 1, 2, 0, 2, 3,
+            4, 5, 6, 4, 6, 7,
+            8, 9, 10, 8, 10, 11,
+            12, 13, 14, 12, 14, 15,
+            16, 17, 18, 16, 18, 19,
+            20, 21, 22, 20, 22, 23
+        );
+    }
+}
+
+class Head extends Shape {
+    constructor() {
+        super("position", "normal");
+        this.arrays.position = Vector3.cast(
+            [-2.5, -2, 3], [2.5, -2, 3], [2.5, 2, 3], [-2.5, 2, 3], // Front face
+            [-2.5, -2, -3], [-2.5, 2, -3], [2.5, 2, -3], [2.5, -2, -3], // Back face
+            [-2.5, 2, -3], [-2.5, 2, 3], [2.5, 2, 3], [2.5, 2, -3], // Top face
+            [-2.5, -2, -3], [2.5, -2, -3], [2.5, -2, 3], [-2.5, -2, 3], // Bottom face
+            [2.5, -2, -3], [2.5, 2, -3], [2.5, 2, 3], [2.5, -2, 3], // Right face
+            [-2.5, -2, -3], [-2.5, -2, 3], [-2.5, 2, 3], [-2.5, 2, -3] // Left face
+        );
+        this.arrays.normal = Vector3.cast(
+            [0, 0, 1], [0, 0, 1], [0, 0, 1], [0, 0, 1], // Front face
+            [0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1], // Back face
+            [0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0], // Top face
+            [0, -1, 0], [0, -1, 0], [0, -1, 0], [0, -1, 0], // Bottom face
+            [1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0], // Right face
+            [-1, 0, 0], [-1, 0, 0], [-1, 0, 0], [-1, 0, 0] // Left face
+        );
+        this.indices.push(
+            0, 1, 2, 0, 2, 3, // Front face
+            4, 5, 6, 4, 6, 7, // Back face
+            8, 9, 10, 8, 10, 11, // Top face
+            12, 13, 14, 12, 14, 15, // Bottom face
+            16, 17, 18, 16, 18, 19, // Right face
+            20, 21, 22, 20, 22, 23 // Left face
+        );
+    }
+}
+
+class Mouth extends Shape {
+    constructor() {
+        super("position", "normal");
+        this.arrays.position = Vector3.cast(
+            [-1.5, -1, 0.5], [1.5, -1, 0.5], [1.5, 1, 0.5], [-1.5, 1, 0.5], // Front face
+            [-1.5, -1, -0.5], [-1.5, 1, -0.5], [1.5, 1, -0.5], [1.5, -1, -0.5], // Back face
+            [-1.5, 1, -0.5], [-1.5, 1, 0.5], [1.5, 1, 0.5], [1.5, 1, -0.5], // Top face
+            [-1.5, -1, -0.5], [1.5, -1, -0.5], [1.5, -1, 0.5], [-1.5, -1, 0.5], // Bottom face
+            [1.5, -1, -0.5], [1.5, 1, -0.5], [1.5, 1, 0.5], [1.5, -1, 0.5], // Right face
+            [-1.5, -1, -0.5], [-1.5, -1, 0.5], [-1.5, 1, 0.5], [-1.5, 1, -0.5] // Left face
+        );
+        this.arrays.normal = Vector3.cast(
+            [0, 0, 1], [0, 0, 1], [0, 0, 1], [0, 0, 1], // Front face
+            [0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1], // Back face
+            [0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0], // Top face
+            [0, -1, 0], [0, -1, 0], [0, -1, 0], [0, -1, 0], // Bottom face
+            [1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0], // Right face
+            [-1, 0, 0], [-1, 0, 0], [-1, 0, 0], [-1, 0, 0] // Left face
+        );
+        this.indices.push(
+            0, 1, 2, 0, 2, 3, // Front face
+            4, 5, 6, 4, 6, 7, // Back face
+            8, 9, 10, 8, 10, 11, // Top face
+            12, 13, 14, 12, 14, 15, // Bottom face
+            16, 17, 18, 16, 18, 19, // Right face
+            20, 21, 22, 20, 22, 23 // Left face
+        );
+    }
+}
+
 
 class Cat extends Shape {
     constructor() {
@@ -142,26 +194,68 @@ class Cat extends Shape {
         this.front_right_leg = new Leg();
         this.back_left_leg = new Leg();
         this.back_right_leg = new Leg();
+
+        // Body 
+        this.body = new Body();
+
+        // Head
+        this.head = new Head();
+        this.mouth = new Mouth();
+        this.right_ear = new small_Cube();
+        this.left_ear = new small_Cube();
+
+        // Tail - 4 parts
+        this.tail_1 = new small_Cube();
+        this.tail_2 = new small_Cube();
+        this.tail_3 = new small_Cube();
+        this.tail_4 = new small_Cube();
     }
 
 
-    draw(context, program_state, model_transform, material) {
-        // Front left leg
-        let front_left_transform = model_transform.times(Mat4.translation(-2, 0, 2));
-        this.front_left_leg.draw(context, program_state, front_left_transform, material);
+    draw_stand(context, program_state, model_transform, material) {
+        model_transform = model_transform.times(Mat4.translation(-5, -5, -5))
 
-        // Back left leg
-        let back_left_transform = model_transform.times(Mat4.translation(-2, 0, -2));
-        this.back_left_leg.draw(context, program_state, back_left_transform, material);
+        // Legs
+        let leg_translation = 1.5;
+        let z_leg_separation = 9.5;
 
-        // Front right leg
-        let front_right_transform = model_transform.times(Mat4.translation(2, 0, 2));
-        this.front_right_leg.draw(context, program_state, front_right_transform, material);
+        let front_left_leg_transform = model_transform.times(Mat4.translation(-leg_translation, 0, 2));
+        this.front_left_leg.draw(context, program_state, front_left_leg_transform, material);
 
-        // Back right leg
-        let back_right_transform = model_transform.times(Mat4.translation(2, 0, -2));
-        this.back_right_leg.draw(context, program_state, back_right_transform, material);
+        let front_right_leg_transform = model_transform.times(Mat4.translation(leg_translation, 0, 2));
+        this.front_right_leg.draw(context, program_state, front_right_leg_transform, material);
+
+        let back_left_leg_transform = model_transform.times(Mat4.translation(-leg_translation, 0, -z_leg_separation));
+        this.back_left_leg.draw(context, program_state, back_left_leg_transform, material);
+
+        let back_right_leg_transform = model_transform.times(Mat4.translation(leg_translation, 0, -z_leg_separation));
+        this.back_right_leg.draw(context, program_state, back_right_leg_transform, material);
+
+        // Body
+        let body_transform = model_transform.times(Mat4.translation(0, 5, -3.5)); // Adjust the height as needed
+        this.body.draw(context, program_state, body_transform, material);
+
+        // Head
+        this.head.draw(context, program_state, model_transform.times(Mat4.translation(0, 7, 6.5)), material);
+        this.mouth.draw(context, program_state, model_transform.times(Mat4.translation(0, 6, 10)), material)
+
+        // Ears
+        this.right_ear.draw(context, program_state, model_transform.times(Mat4.translation(2, 9.5, 4.5)).times(Mat4.scale(1, 1, 2)), material)
+        this.left_ear.draw(context, program_state, model_transform.times(Mat4.translation(-2, 9.5, 4.5)).times(Mat4.scale(1, 1, 2)), material)
+
+        // Tail
+        this.tail_1.draw(context, program_state, model_transform.times(Mat4.translation(0, 6, -13.5)).times(Mat4.scale(1, 1, 3)), material);
+        this.tail_2.draw(context, program_state, model_transform.times(Mat4.translation(0, 5, -15.5)), material);
+        this.tail_3.draw(context, program_state, model_transform.times(Mat4.translation(0, 4, -16.5)), material);
+        this.tail_4.draw(context, program_state, model_transform.times(Mat4.translation(0, 3, -19.5)).times(Mat4.scale(1, 1, 5)), material);
+
+        model_transform = Mat4.identity();
     }
+
+    draw_sit(context, program_state, model_transform, materials) {
+        model_transform = model_transform;
+    }
+
 }
 
 class Base_Scene extends Scene {
@@ -170,53 +264,40 @@ class Base_Scene extends Scene {
         this.hover = this.swarm = false;
         this.shapes = {
             'cube': new Cube(),
-            'leg': new Leg(),
             'cat': new Cat(),
-            'plane': new Plane(),
-            'ball': new defs.Subdivision_Sphere(4)
         };
 
         this.materials = {
             plastic: new Material(new defs.Phong_Shader(),
                 { ambient: .4, diffusivity: .6, color: hex_color("#ffffff") }),
+            test: new Material(new defs.Phong_Shader(),
+                { ambient: 1, diffusivity: .6, color: hex_color("#786f80") })
         };
 
-        this.white = new Material(new defs.Basic_Shader());
-        this.outline = false;
-        this.swing = true;
-
-        this.colors = [];
-        this.set_colors();
-    }
-
-    set_colors() {
-        this.colors = [color(1, 0, 0, 1), color(0, 1, 0, 1), color(0, 0, 1, 1)];
+        this.cat_sit = false;
     }
 
     display(context, program_state) {
         if (!context.scratchpad.controls) {
             this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
-            program_state.set_camera((Mat4.rotation(Math.PI / 8, 0, -1, 0)).times(Mat4.translation(-10, -2, -25)));
+            program_state.set_camera(/*Mat4.rotation(Math.PI / 6, 0, -1, 0).times*/(Mat4.translation(0, 0, -30)));
         }
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, 1, 100);
 
-        const light_position = vec4(0, 5, 5, 1);
-        program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000)];
+        const light_position = vec4(-15, 10, 10, 1);
+        program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 100000)];
     }
 }
 
 export class Project extends Base_Scene {
     make_control_panel() {
-        this.key_triggered_button("Change Colors", ["c"], this.set_colors);
+        /*this.key_triggered_button("Change Colors", ["c"], this.set_colors);
         this.key_triggered_button("Outline", ["o"], () => {
             this.outline = !this.outline;
-        });
-        this.key_triggered_button("Sit still", ["m"], () => {
-            this.swing = !this.swing;
-        });
-        this.key_triggered_button("Ball", ["b"], () => {
-            this.ball ^= 1;
+        });*/
+        this.key_triggered_button("Sit", ["m"], () => {
+            this.cat_sit = !this.cat_sit;
         });
     }
 
@@ -224,18 +305,12 @@ export class Project extends Base_Scene {
         super.display(context, program_state);
         let model_transform = Mat4.identity();
 
-        const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
-
-        this.shapes.cat.draw(context, program_state, model_transform, this.materials.plastic);
-        this.shapes.plane.draw(context, program_state, Mat4.translation(0, -3, 0)
-                .times(Mat4.scale(50, 50, 1)),
-            this.materials.plastic);
-
-        /*if(this.ball) {
-            let ball = new ball_fall()
-            model_transform = model_transform.times(Mat4.translation(0, 5, 0));
-            ball.display(program_state, model_transform);
-            //model_transform = model_transform.times(Mat4.translation(0, 2.5 * Math.cos(t) + 3.5, 0));
-        }*/
+        if (this.cat_sit == false) {
+            this.shapes.cat.draw_stand(context, program_state, model_transform, this.materials.test);
+        }
+        else {
+            // Sitting cat animation
+            this.shapes.draw_sit(context, program_state, model_transform, this.materials.test);
+        }
     }
 }
