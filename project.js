@@ -258,25 +258,25 @@ class Cat extends Shape {
 
 }
 
-class Brush extends Shape{
+class Brush extends Shape {
     constructor() {
         super("position", "normal");
-            this.head = new defs.Capped_Cylinder(15, 15);
-            this.handle = new defs.Rounded_Capped_Cylinder(15, 15);
-            this.brush = new defs.Closed_Cone(15,15);
+        this.head = new defs.Capped_Cylinder(15, 15);
+        this.handle = new defs.Rounded_Capped_Cylinder(15, 15);
+        this.brush = new defs.Closed_Cone(15, 15);
     }
 
-    draw_brush(context, program_state, model_transform, material){
+    draw_brush(context, program_state, model_transform, material) {
         model_transform = model_transform.times(Mat4.scale(2, 2, .5));
         this.head.draw(context, program_state, model_transform, material);
 
-        model_transform = model_transform.times(Mat4.scale(1/2, 3/2, 1/3))
+        model_transform = model_transform.times(Mat4.scale(1 / 2, 3 / 2, 1 / 3))
             .times(Mat4.translation(0, -1, 0))
         this.handle.draw(context, program_state, model_transform, material);
-        model_transform = model_transform.times(Mat4.scale(2, 1/3, 2))
+        model_transform = model_transform.times(Mat4.scale(2, 1 / 3, 2))
             .times(Mat4.translation(-.4, 4, 1));
 
-        model_transform = model_transform.times(Mat4.scale(1/4, 1/4, 2))
+        model_transform = model_transform.times(Mat4.scale(1 / 4, 1 / 4, 2))
             .times(Mat4.translation(.5, .5, .5))
         this.brush.draw(context, program_state, model_transform, material);
         model_transform = model_transform.times(Mat4.translation(2.25, 0, 0))
@@ -325,11 +325,11 @@ class Base_Scene extends Scene {
             plastic: new Material(new defs.Phong_Shader(),
                 { ambient: .4, diffusivity: .6, color: hex_color("#ffffff") }),
             green_grass: new Material(bump,
-                {ambient: .5, texture: new Texture("assets/green-grass-512x512.png")}),
+                { ambient: .5, texture: new Texture("assets/green-grass-512x512.png") }),
             sky_blue: new Material(textured,
-                {ambient: .5, texture: new Texture("assets/sky.png")}),
+                { ambient: .5, texture: new Texture("assets/sky.png") }),
             sun: new Material(textured,
-                {ambient: 1, texture: new Texture("assets/sun_softer.png")}),
+                { ambient: 1, texture: new Texture("assets/sun_softer.png") }),
             test: new Material(new defs.Phong_Shader(),
                 { ambient: 1, diffusivity: .6, color: hex_color("#786f80") })
         };
@@ -370,16 +370,15 @@ export class Project extends Base_Scene {
         super.display(context, program_state);
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         let model_transform = Mat4.identity();
-        const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000
 
         if (this.cat_sit == false) {
             this.shapes.cat.draw_stand(context, program_state, model_transform, this.materials.test);
             if (this.brush_out) {
-            model_transform = model_transform.times(Mat4.translation(-5, 4, -10))
-                .times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
-            let brush_transform = model_transform.copy()
-            brush_transform = brush_transform.times(Mat4.translation(0, 5*Math.cos(t), 0));
-            this.shapes.brush.draw_brush(context, program_state, brush_transform, this.materials.test);
+                model_transform = model_transform.times(Mat4.translation(-5, 4, -10))
+                    .times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
+                let brush_transform = model_transform.copy()
+                brush_transform = brush_transform.times(Mat4.translation(0, 5 * Math.cos(t), 0));
+                this.shapes.brush.draw_brush(context, program_state, brush_transform, this.materials.test);
             }
         }
         else {
@@ -427,7 +426,7 @@ export class Project extends Base_Scene {
         const sun_color = color(1, sun_color_fraction, 0, 1); // Transition from red to yellow
         let sun_transform = Mat4.identity();
         sun_transform = sun_transform.times(Mat4.translation(-6, 6, 0));
-        this.shapes.sphere.draw(context, program_state, sun_transform, this.materials.sun.override({color: sun_color}));
+        this.shapes.sphere.draw(context, program_state, sun_transform, this.materials.sun.override({ color: sun_color }));
 
     }
 }
