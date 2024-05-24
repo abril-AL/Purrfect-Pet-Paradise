@@ -23,6 +23,14 @@ class Cube extends Shape {
             [1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0],
             [-1, 0, 0], [-1, 0, 0], [-1, 0, 0], [-1, 0, 0]
         );
+        this.arrays.texture_coord = Vector.cast(
+            [0, 0], [1, 0], [1, 1], [0, 1],
+            [1, 0], [1, 1], [0, 1], [0, 0],
+            [0, 0], [1, 0], [1, 1], [0, 1],
+            [0, 0], [1, 0], [1, 1], [0, 1],
+            [0, 0], [1, 0], [1, 1], [0, 1],
+            [0, 0], [1, 0], [1, 1], [0, 1]
+        );
         this.indices.push(
             0, 1, 2, 0, 2, 3,
             4, 5, 6, 4, 6, 7,
@@ -52,6 +60,14 @@ class small_Cube extends Shape {
             [0, -1, 0], [0, -1, 0], [0, -1, 0], [0, -1, 0], // Bottom face
             [1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0], // Right face
             [-1, 0, 0], [-1, 0, 0], [-1, 0, 0], [-1, 0, 0] // Left face
+        );
+        this.arrays.texture_coord = Vector.cast(
+            [0, 0], [1, 0], [1, 1], [0, 1], // Front face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Back face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Top face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Bottom face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Right face
+            [0, 0], [1, 0], [1, 1], [0, 1] // Left face
         );
         this.indices.push(
             0, 1, 2, 0, 2, 3, // Front face
@@ -83,6 +99,14 @@ class Leg extends Shape {
             [1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0],
             [-1, 0, 0], [-1, 0, 0], [-1, 0, 0], [-1, 0, 0]
         );
+        this.arrays.texture_coord = Vector.cast(
+            [0, 0], [1, 0], [1, 1], [0, 1], // Front face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Back face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Top face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Bottom face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Right face
+            [0, 0], [1, 0], [1, 1], [0, 1] // Left face
+        );
         this.indices.push(
             0, 1, 2, 0, 2, 3,
             4, 5, 6, 4, 6, 7,
@@ -112,6 +136,14 @@ class Body extends Shape {
             [0, -1, 0], [0, -1, 0], [0, -1, 0], [0, -1, 0],
             [1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0],
             [-1, 0, 0], [-1, 0, 0], [-1, 0, 0], [-1, 0, 0]
+        );
+        this.arrays.texture_coord = Vector.cast(
+            [0, 0], [1, 0], [1, 1], [0, 1], // Front face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Back face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Top face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Bottom face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Right face
+            [0, 0], [1, 0], [1, 1], [0, 1]  // Left face
         );
         this.indices.push(
             0, 1, 2, 0, 2, 3,
@@ -143,6 +175,14 @@ class Head extends Shape {
             [1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0], // Right face
             [-1, 0, 0], [-1, 0, 0], [-1, 0, 0], [-1, 0, 0] // Left face
         );
+        this.arrays.texture_coord = Vector.cast(
+            [0, 0], [1, 0], [1, 1], [0, 1], // Front face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Back face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Top face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Bottom face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Right face
+            [0, 0], [1, 0], [1, 1], [0, 1] // Left face
+        );
         this.indices.push(
             0, 1, 2, 0, 2, 3, // Front face
             4, 5, 6, 4, 6, 7, // Back face
@@ -172,6 +212,14 @@ class Mouth extends Shape {
             [0, -1, 0], [0, -1, 0], [0, -1, 0], [0, -1, 0], // Bottom face
             [1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0], // Right face
             [-1, 0, 0], [-1, 0, 0], [-1, 0, 0], [-1, 0, 0] // Left face
+        );
+        this.arrays.texture_coord = Vector.cast(
+            [0, 0], [1, 0], [1, 1], [0, 1], // Front face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Back face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Top face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Bottom face
+            [0, 0], [1, 0], [1, 1], [0, 1], // Right face
+            [0, 0], [1, 0], [1, 1], [0, 1]  // Left face
         );
         this.indices.push(
             0, 1, 2, 0, 2, 3, // Front face
@@ -211,43 +259,42 @@ class Cat extends Shape {
         this.tail_4 = new small_Cube();
     }
 
-
-    draw_stand(context, program_state, model_transform, material) {
-        model_transform = model_transform.times(Mat4.translation(-5, -5, -5))
+    draw_stand(context, program_state, model_transform, leg_material, body_material, head_material, mouth_material, ear_material, tail_material) {
+        model_transform = model_transform.times(Mat4.translation(-5, -5, -5));
 
         // Legs
         let leg_translation = 1.5;
         let z_leg_separation = 9.5;
 
         let front_left_leg_transform = model_transform.times(Mat4.translation(-leg_translation, 0, 2));
-        this.front_left_leg.draw(context, program_state, front_left_leg_transform, material);
+        this.front_left_leg.draw(context, program_state, front_left_leg_transform, leg_material);
 
         let front_right_leg_transform = model_transform.times(Mat4.translation(leg_translation, 0, 2));
-        this.front_right_leg.draw(context, program_state, front_right_leg_transform, material);
+        this.front_right_leg.draw(context, program_state, front_right_leg_transform, leg_material);
 
         let back_left_leg_transform = model_transform.times(Mat4.translation(-leg_translation, 0, -z_leg_separation));
-        this.back_left_leg.draw(context, program_state, back_left_leg_transform, material);
+        this.back_left_leg.draw(context, program_state, back_left_leg_transform, leg_material);
 
         let back_right_leg_transform = model_transform.times(Mat4.translation(leg_translation, 0, -z_leg_separation));
-        this.back_right_leg.draw(context, program_state, back_right_leg_transform, material);
+        this.back_right_leg.draw(context, program_state, back_right_leg_transform, leg_material);
 
         // Body
         let body_transform = model_transform.times(Mat4.translation(0, 5, -3.5)); // Adjust the height as needed
-        this.body.draw(context, program_state, body_transform, material);
+        this.body.draw(context, program_state, body_transform, body_material);
 
         // Head
-        this.head.draw(context, program_state, model_transform.times(Mat4.translation(0, 7, 6.5)), material);
-        this.mouth.draw(context, program_state, model_transform.times(Mat4.translation(0, 6, 10)), material)
+        this.head.draw(context, program_state, model_transform.times(Mat4.translation(0, 7, 6.5)), head_material);
+        this.mouth.draw(context, program_state, model_transform.times(Mat4.translation(0, 6, 10)), mouth_material);
 
         // Ears
-        this.right_ear.draw(context, program_state, model_transform.times(Mat4.translation(2, 9.5, 4.5)).times(Mat4.scale(1, 1, 2)), material)
-        this.left_ear.draw(context, program_state, model_transform.times(Mat4.translation(-2, 9.5, 4.5)).times(Mat4.scale(1, 1, 2)), material)
+        this.right_ear.draw(context, program_state, model_transform.times(Mat4.translation(2, 9.5, 4.5)).times(Mat4.scale(1, 1, 2)), ear_material);
+        this.left_ear.draw(context, program_state, model_transform.times(Mat4.translation(-2, 9.5, 4.5)).times(Mat4.scale(1, 1, 2)), ear_material);
 
         // Tail
-        this.tail_1.draw(context, program_state, model_transform.times(Mat4.translation(0, 6, -13.5)).times(Mat4.scale(1, 1, 3)), material);
-        this.tail_2.draw(context, program_state, model_transform.times(Mat4.translation(0, 5, -15.5)), material);
-        this.tail_3.draw(context, program_state, model_transform.times(Mat4.translation(0, 4, -16.5)), material);
-        this.tail_4.draw(context, program_state, model_transform.times(Mat4.translation(0, 3, -19.5)).times(Mat4.scale(1, 1, 5)), material);
+        this.tail_1.draw(context, program_state, model_transform.times(Mat4.translation(0, 6, -13.5)).times(Mat4.scale(1, 1, 3)), tail_material);
+        this.tail_2.draw(context, program_state, model_transform.times(Mat4.translation(0, 5, -15.5)), tail_material);
+        this.tail_3.draw(context, program_state, model_transform.times(Mat4.translation(0, 4, -16.5)), tail_material);
+        this.tail_4.draw(context, program_state, model_transform.times(Mat4.translation(0, 3, -19.5)).times(Mat4.scale(1, 1, 5)), tail_material);
 
         model_transform = Mat4.identity();
     }
@@ -257,6 +304,7 @@ class Cat extends Shape {
     }
 
 }
+
 
 class Brush extends Shape {
     constructor() {
@@ -331,7 +379,19 @@ class Base_Scene extends Scene {
             sun: new Material(textured,
                 { ambient: 1, texture: new Texture("assets/sun_softer.png") }),
             test: new Material(new defs.Phong_Shader(),
-                { ambient: 1, diffusivity: .6, color: hex_color("#786f80") })
+                { ambient: 1, diffusivity: .6, color: hex_color("#786f80") }),
+            cat_body: new Material(bump,
+                { ambient: .5, texture: new Texture("assets/cat_body.png") }),
+            cat_general: new Material(bump,
+                { ambient: .5, texture: new Texture("assets/cat_general.png") }),
+            cat_head: new Material(bump,
+                { ambient: .5, texture: new Texture("assets/cat_head.png") }),
+            cat_mouth: new Material(bump,
+                { ambient: .5, texture: new Texture("assets/cat_head.png") }),
+            eye_tile: new Material(bump,
+                { ambient: .5, texture: new Texture("assets/face.png") }),
+            nose_tile: new Material(bump,
+                { ambient: .5, texture: new Texture("assets/nose.png") }),
         };
 
         this.cat_sit = false;
@@ -341,7 +401,7 @@ class Base_Scene extends Scene {
     display(context, program_state) {
         if (!context.scratchpad.controls) {
             this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
-            program_state.set_camera(/*Mat4.rotation(Math.PI / 6, 0, -1, 0).times*/(Mat4.translation(0, 0, -30)));
+            program_state.set_camera(/*Mat4.rotation(Math.PI / 6, 0, -1, 0).times*/(Mat4.translation(3, -2, -10)));
         }
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, 1, 100);
@@ -372,7 +432,17 @@ export class Project extends Base_Scene {
         let model_transform = Mat4.identity();
 
         if (this.cat_sit == false) {
-            this.shapes.cat.draw_stand(context, program_state, model_transform, this.materials.test);
+            model_transform = model_transform.times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, 2, -2));
+            this.shapes.cat.draw_stand(context, program_state, model_transform,
+                this.materials.cat_general, this.materials.cat_body, this.materials.cat_head,
+                this.materials.cat_head, this.materials.cat_general, this.materials.cat_general);
+            //eyes 
+            this.shapes.cube_tile.draw(context, program_state, model_transform.times(Mat4.scale(2.2, 2, 0.1))
+                .times(Mat4.translation(-2.3, 1, 45)), this.materials.eye_tile);
+            //nose
+            this.shapes.cube_tile.draw(context, program_state, model_transform.times(Mat4.scale(1 / 4, 1 / 4, 1 / 20))
+                .times(Mat4.translation(-20.3, 6.5, 110)), this.materials.nose_tile);
+
             if (this.brush_out) {
                 model_transform = model_transform.times(Mat4.translation(-5, 4, -10))
                     .times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
@@ -382,14 +452,14 @@ export class Project extends Base_Scene {
             }
         }
         else {
-            // Sitting cat animation
+            // Sitting cat animation 
             this.shapes.draw_sit(context, program_state, model_transform, this.materials.test);
         }
 
         // model_transform = model_transform.times(Mat4.translation(15, 0, 0))
         // this.shapes.brush.draw_brush(context, program_state, model_transform, this.materials.test);
 
-        this.shapes.cat.draw(context, program_state, model_transform, this.materials.plastic);
+        //this.shapes.cat.draw(context, program_state, model_transform, this.materials.plastic);
 
         // Center ground tile
         model_transform = Mat4.identity();
