@@ -258,6 +258,54 @@ class Cat extends Shape {
 
 }
 
+class Brush extends Shape{
+    constructor() {
+        super("position", "normal");
+            this.head = new defs.Capped_Cylinder(15, 15);
+            this.handle = new defs.Rounded_Capped_Cylinder(15, 15);
+            this.brush = new defs.Closed_Cone(15,15);
+    }
+
+    draw_brush(context, program_state, model_transform, material){
+        model_transform = model_transform.times(Mat4.scale(2, 2, .5));
+        this.head.draw(context, program_state, model_transform, material);
+
+        model_transform = model_transform.times(Mat4.scale(1/2, 3/2, 1/3))
+            .times(Mat4.translation(0, -1, 0))
+        this.handle.draw(context, program_state, model_transform, material);
+        model_transform = model_transform.times(Mat4.scale(2, 1/3, 2))
+            .times(Mat4.translation(-.4, 4, 1));
+
+        model_transform = model_transform.times(Mat4.scale(1/4, 1/4, 2))
+            .times(Mat4.translation(.5, 1, 1))
+        this.brush.draw(context, program_state, model_transform, material);
+        model_transform = model_transform.times(Mat4.translation(2.25, 0, 0))
+        this.brush.draw(context, program_state, model_transform, material);
+        model_transform = model_transform.times(Mat4.translation(-3.5, -2.25, 0))
+        this.brush.draw(context, program_state, model_transform, material);
+        model_transform = model_transform.times(Mat4.translation(2.25, 0, 0))
+        this.brush.draw(context, program_state, model_transform, material);
+        model_transform = model_transform.times(Mat4.translation(2.25, 0, 0))
+        this.brush.draw(context, program_state, model_transform, material);
+        model_transform = model_transform.times(Mat4.translation(-4.5, -2.25, 0))
+        this.brush.draw(context, program_state, model_transform, material);
+        model_transform = model_transform.times(Mat4.translation(2.25, 0, 0))
+        this.brush.draw(context, program_state, model_transform, material);
+        model_transform = model_transform.times(Mat4.translation(2.25, 0, 0))
+        this.brush.draw(context, program_state, model_transform, material);
+        model_transform = model_transform.times(Mat4.translation(-4.5, -2.25, 0))
+        this.brush.draw(context, program_state, model_transform, material);
+        model_transform = model_transform.times(Mat4.translation(2.25, 0, 0))
+        this.brush.draw(context, program_state, model_transform, material);
+        model_transform = model_transform.times(Mat4.translation(2.25, 0, 0))
+        this.brush.draw(context, program_state, model_transform, material);
+        model_transform = model_transform.times(Mat4.translation(-3.5, -2.25, 0))
+        this.brush.draw(context, program_state, model_transform, material);
+        model_transform = model_transform.times(Mat4.translation(2.25, 0, 0))
+        this.brush.draw(context, program_state, model_transform, material);
+    }
+}
+
 class Base_Scene extends Scene {
     constructor() {
         super();
@@ -265,6 +313,7 @@ class Base_Scene extends Scene {
         this.shapes = {
             'cube': new Cube(),
             'cat': new Cat(),
+            'brush': new Brush(),
         };
 
         this.materials = {
@@ -275,6 +324,7 @@ class Base_Scene extends Scene {
         };
 
         this.cat_sit = false;
+        this.brush_out = false;
     }
 
     display(context, program_state) {
@@ -299,6 +349,10 @@ export class Project extends Base_Scene {
         this.key_triggered_button("Sit", ["m"], () => {
             this.cat_sit = !this.cat_sit;
         });
+
+        this.key_triggered_button("Brush", ["b"], () => {
+            this.brush_out = !this.brush_out;
+        });
     }
 
     display(context, program_state) {
@@ -312,5 +366,9 @@ export class Project extends Base_Scene {
             // Sitting cat animation
             this.shapes.draw_sit(context, program_state, model_transform, this.materials.test);
         }
+
+        model_transform = model_transform.times(Mat4.translation(15, 0, 0))
+        this.shapes.brush.draw_brush(context, program_state, model_transform, this.materials.test);
+
     }
 }
