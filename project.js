@@ -400,6 +400,9 @@ class Base_Scene extends Scene {
                 { ambient: .5, texture: new Texture("assets/grey_face.png") }),
             nose_tile: new Material(bump,
                 { ambient: .5, texture: new Texture("assets/nose.png") }),
+
+            heart: new Material(bump,
+                { ambient: 1, texture: new Texture("assets/heart.png") }),
         };
 
         this.cat_sit = false;
@@ -483,6 +486,11 @@ export class Project extends Base_Scene {
                 let brush_transform = model_transform.copy()
                 brush_transform = brush_transform.times(Mat4.translation(0, 5 * Math.cos(t), 0));
                 this.shapes.brush.draw_brush(context, program_state, brush_transform, this.materials.test);
+
+                //happy cat
+                model_transform = Mat4.identity();
+                this.shapes.cube_tile.draw(context, program_state, model_transform.times(Mat4.scale(1 / 2, 1 / 2, 0)).times(Mat4.translation(-9, -2, 3)), this.materials.heart);
+
             }
         }
         else {
