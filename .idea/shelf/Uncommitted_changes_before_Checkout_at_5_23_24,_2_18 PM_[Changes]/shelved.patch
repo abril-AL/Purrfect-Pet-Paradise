@@ -1,0 +1,73 @@
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"8fc93788-540b-4242-9b9a-993e3b48f8a3\" name=\"Changes\" comment=\"Collision-demo ball bounce working , needs to be put into the main scene&#10;&#10;Plane class (Probably won't need this for final scene bc can use squares instead)&#10;&#10;Simulate ball_bounce class in project.js file placed needs to be utilized in main-scene\">\n      <changelist_data name=\"George Zevada\" email=\"gjzevada@gmail.com\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"PREVIOUS_COMMIT_AUTHORS\">\n      <list>\n        <option value=\"George Zevada &lt;gjzevada@gmail.com&gt;\" />\n      </list>\n    </option>\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\n      <map>\n        <entry key=\"$PROJECT_DIR$\" value=\"main\" />\n      </map>\n    </option>\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n    <option name=\"SIGN_OFF_COMMIT\" value=\"true\" />\n  </component>\n  <component name=\"GitHubPullRequestSearchHistory\">{\n  &quot;lastFilter&quot;: {\n    &quot;state&quot;: &quot;OPEN&quot;,\n    &quot;assignee&quot;: &quot;gjzev&quot;\n  }\n}</component>\n  <component name=\"GithubPullRequestsUISettings\">{\n  &quot;selectedUrlAndAccountId&quot;: {\n    &quot;url&quot;: &quot;https://github.com/abril-AL/Purrfect-Pet-Paradise.git&quot;,\n    &quot;accountId&quot;: &quot;67e18bb7-fef8-44d5-8d1d-78216535f159&quot;\n  }\n}</component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;customColor&quot;: &quot;&quot;,\n  &quot;associatedIndex&quot;: 1\n}</component>\n  <component name=\"ProjectId\" id=\"2gnx7ObZGfVaC6t1DXYqb0JrxqM\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"JavaScript Debug.index.html.executor\": \"Run\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"Shell Script.host.command.executor\": \"Run\",\n    \"git-widget-placeholder\": \"ball\",\n    \"node.js.detected.package.eslint\": \"true\",\n    \"node.js.detected.package.tslint\": \"true\",\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\n    \"nodejs_package_manager_path\": \"npm\",\n    \"vue.rearranger.settings.migration\": \"true\"\n  }\n}]]></component>\n  <component name=\"SharedIndexes\">\n    <attachedChunks>\n      <set>\n        <option value=\"bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-WS-241.14494.235\" />\n      </set>\n    </attachedChunks>\n  </component>\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"8fc93788-540b-4242-9b9a-993e3b48f8a3\" name=\"Changes\" comment=\"\" />\n      <created>1716346974977</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1716346974977</updated>\n      <workItem from=\"1716346976431\" duration=\"12011000\" />\n      <workItem from=\"1716414614784\" duration=\"1082000\" />\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"Collision-demo ball bounce working , needs to be put into the main scene&#10;&#10;Plane class (Probably won't need this for final scene bc can use squares instead)&#10;&#10;Simulate ball_bounce class in project.js file placed needs to be utilized in main-scene\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1716414442004</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1716414442004</updated>\n    </task>\n    <task id=\"LOCAL-00002\" summary=\"Ball Branch\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1716415392978</created>\n      <option name=\"number\" value=\"00002\" />\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1716415392978</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"3\" />\n    <servers />\n  </component>\n  <component name=\"TypeScriptGeneratedFilesManager\">\n    <option name=\"version\" value=\"3\" />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State />\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"Collision-demo ball bounce working , needs to be put into the main scene&#10;&#10;Plane class (Probably won't need this for final scene bc can use squares instead)&#10;&#10;Simulate ball_bounce class in project.js file placed needs to be utilized in main-scene\" />\n    <MESSAGE value=\"Ball Branch\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Ball Branch\" />\n  </component>\n</project>
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	
++++ b/.idea/workspace.xml	
+@@ -5,7 +5,7 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="8fc93788-540b-4242-9b9a-993e3b48f8a3" name="Changes" comment="Collision-demo ball bounce working , needs to be put into the main scene&#10;&#10;Plane class (Probably won't need this for final scene bc can use squares instead)&#10;&#10;Simulate ball_bounce class in project.js file placed needs to be utilized in main-scene">
+-      <changelist_data name="George Zevada" email="gjzevada@gmail.com" />
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -20,7 +20,7 @@
+     </option>
+     <option name="RECENT_BRANCH_BY_REPOSITORY">
+       <map>
+-        <entry key="$PROJECT_DIR$" value="main" />
++        <entry key="$PROJECT_DIR$" value="ball" />
+       </map>
+     </option>
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+@@ -52,7 +52,7 @@
+     "JavaScript Debug.index.html.executor": "Run",
+     "RunOnceActivity.ShowReadmeOnStart": "true",
+     "Shell Script.host.command.executor": "Run",
+-    "git-widget-placeholder": "ball",
++    "git-widget-placeholder": "0464bc10",
+     "node.js.detected.package.eslint": "true",
+     "node.js.detected.package.tslint": "true",
+     "node.js.selected.package.eslint": "(autodetect)",
+@@ -78,6 +78,8 @@
+       <updated>1716346974977</updated>
+       <workItem from="1716346976431" duration="12011000" />
+       <workItem from="1716414614784" duration="1082000" />
++      <workItem from="1716416033207" duration="1106000" />
++      <workItem from="1716498747269" duration="219000" />
+     </task>
+     <task id="LOCAL-00001" summary="Collision-demo ball bounce working , needs to be put into the main scene&#10;&#10;Plane class (Probably won't need this for final scene bc can use squares instead)&#10;&#10;Simulate ball_bounce class in project.js file placed needs to be utilized in main-scene">
+       <option name="closed" value="true" />
+@@ -95,7 +97,15 @@
+       <option name="project" value="LOCAL" />
+       <updated>1716415392978</updated>
+     </task>
+-    <option name="localTasksCounter" value="3" />
++    <task id="LOCAL-00003" summary="Collision-demo ball bounce working , needs to be put into the main scene&#10;&#10;Plane class (Probably won't need this for final scene bc can use squares instead)&#10;&#10;Simulate ball_bounce class in project.js file placed needs to be utilized in main-scene">
++      <option name="closed" value="true" />
++      <created>1716420675090</created>
++      <option name="number" value="00003" />
++      <option name="presentableId" value="LOCAL-00003" />
++      <option name="project" value="LOCAL" />
++      <updated>1716420675090</updated>
++    </task>
++    <option name="localTasksCounter" value="4" />
+     <servers />
+   </component>
+   <component name="TypeScriptGeneratedFilesManager">
+@@ -113,8 +123,8 @@
+     </option>
+   </component>
+   <component name="VcsManagerConfiguration">
+-    <MESSAGE value="Collision-demo ball bounce working , needs to be put into the main scene&#10;&#10;Plane class (Probably won't need this for final scene bc can use squares instead)&#10;&#10;Simulate ball_bounce class in project.js file placed needs to be utilized in main-scene" />
+     <MESSAGE value="Ball Branch" />
+-    <option name="LAST_COMMIT_MESSAGE" value="Ball Branch" />
++    <MESSAGE value="Collision-demo ball bounce working , needs to be put into the main scene&#10;&#10;Plane class (Probably won't need this for final scene bc can use squares instead)&#10;&#10;Simulate ball_bounce class in project.js file placed needs to be utilized in main-scene" />
++    <option name="LAST_COMMIT_MESSAGE" value="Collision-demo ball bounce working , needs to be put into the main scene&#10;&#10;Plane class (Probably won't need this for final scene bc can use squares instead)&#10;&#10;Simulate ball_bounce class in project.js file placed needs to be utilized in main-scene" />
+   </component>
+ </project>
+\ No newline at end of file
