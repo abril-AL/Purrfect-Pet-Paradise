@@ -466,7 +466,7 @@ export class Project extends Base_Scene {
 
 
         if (this.cat_sit == false) {
-            model_transform = model_transform.times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, 2, -2));
+            model_transform = model_transform.times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2));
             this.shapes.cat.draw_stand(context, program_state, model_transform,
                 cat_mat, cat_mat, cat_mat,
                 cat_mat, cat_mat, cat_mat);//fix paramaters later
