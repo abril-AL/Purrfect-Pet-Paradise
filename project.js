@@ -277,7 +277,7 @@ class Brush extends Shape{
             .times(Mat4.translation(-.4, 4, 1));
 
         model_transform = model_transform.times(Mat4.scale(1/4, 1/4, 2))
-            .times(Mat4.translation(.5, 1, 1))
+            .times(Mat4.translation(.5, .5, .5))
         this.brush.draw(context, program_state, model_transform, material);
         model_transform = model_transform.times(Mat4.translation(2.25, 0, 0))
         this.brush.draw(context, program_state, model_transform, material);
@@ -358,17 +358,25 @@ export class Project extends Base_Scene {
     display(context, program_state) {
         super.display(context, program_state);
         let model_transform = Mat4.identity();
+        const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000
 
         if (this.cat_sit == false) {
             this.shapes.cat.draw_stand(context, program_state, model_transform, this.materials.test);
+            if (this.brush_out) {
+            model_transform = model_transform.times(Mat4.translation(-5, 4, -10))
+                .times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
+            let brush_transform = model_transform.copy()
+            brush_transform = brush_transform.times(Mat4.translation(0, 5*Math.cos(t), 0));
+            this.shapes.brush.draw_brush(context, program_state, brush_transform, this.materials.test);
+            }
         }
         else {
             // Sitting cat animation
             this.shapes.draw_sit(context, program_state, model_transform, this.materials.test);
         }
 
-        model_transform = model_transform.times(Mat4.translation(15, 0, 0))
-        this.shapes.brush.draw_brush(context, program_state, model_transform, this.materials.test);
+        // model_transform = model_transform.times(Mat4.translation(15, 0, 0))
+        // this.shapes.brush.draw_brush(context, program_state, model_transform, this.materials.test);
 
     }
 }
