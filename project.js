@@ -388,20 +388,32 @@ class Base_Scene extends Scene {
                 { ambient: .5, texture: new Texture("assets/cat_head.png") }),
             cat_mouth: new Material(bump,
                 { ambient: .5, texture: new Texture("assets/cat_head.png") }),
-            eye_tile: new Material(bump,
+
+            cat_black: new Material(new defs.Phong_Shader(),
+                { ambient: .4, diffusivity: .6, color: hex_color("#000000") }),
+            cat_grey: new Material(new defs.Phong_Shader(),
+                { ambient: .4, diffusivity: .6, color: hex_color("#808080") }),
+
+            eye_b: new Material(bump,
                 { ambient: .5, texture: new Texture("assets/face.png") }),
+            eye_g: new Material(bump,
+                { ambient: .5, texture: new Texture("assets/grey_face.png") }),
             nose_tile: new Material(bump,
                 { ambient: .5, texture: new Texture("assets/nose.png") }),
         };
 
         this.cat_sit = false;
         this.brush_out = false;
+
+        this.cat_color_set = ['b', 'g'];
+        this.cat_color = 'b';//default
+        this.cat_color_index = 0;
     }
 
     display(context, program_state) {
         if (!context.scratchpad.controls) {
             this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
-            program_state.set_camera(/*Mat4.rotation(Math.PI / 6, 0, -1, 0).times*/(Mat4.translation(3, -2, -10)));
+            program_state.set_camera(/*Mat4.rotation(Math.PI / 6, 0, -1, 0).times*/(Mat4.translation(3, -2, -20)));
         }
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, 1, 100);
@@ -420,6 +432,15 @@ export class Project extends Base_Scene {
         this.key_triggered_button("Sit", ["m"], () => {
             this.cat_sit = !this.cat_sit;
         });
+        this.key_triggered_button("Changle Fur Color", ["g"], () => {
+            if (this.cat_color_index == 0) {
+                this.cat_color_index += 1;
+            }
+            else {
+                this.cat_color_index = 0;
+            }
+            this.cat_color = this.cat_color_set[this.cat_color_index];
+        });
 
         this.key_triggered_button("Brush", ["b"], () => {
             this.brush_out = !this.brush_out;
@@ -431,14 +452,27 @@ export class Project extends Base_Scene {
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         let model_transform = Mat4.identity();
 
+        let cat_mat;
+        let eye_texture;
+        if (this.cat_color == 'b') {
+            cat_mat = this.materials.cat_black;
+            eye_texture = this.materials.eye_b;
+        }
+        if (this.cat_color == 'g') {
+            cat_mat = this.materials.cat_grey;
+            eye_texture = this.materials.eye_g;
+        }
+        //add more colors later
+
+
         if (this.cat_sit == false) {
             model_transform = model_transform.times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, 2, -2));
             this.shapes.cat.draw_stand(context, program_state, model_transform,
-                this.materials.cat_general, this.materials.cat_body, this.materials.cat_head,
-                this.materials.cat_head, this.materials.cat_general, this.materials.cat_general);
+                cat_mat, cat_mat, cat_mat,
+                cat_mat, cat_mat, cat_mat);//fix paramaters later
             //eyes 
             this.shapes.cube_tile.draw(context, program_state, model_transform.times(Mat4.scale(2.2, 2, 0.1))
-                .times(Mat4.translation(-2.3, 1, 45)), this.materials.eye_tile);
+                .times(Mat4.translation(-2.3, 1, 45)), eye_texture);
             //nose
             this.shapes.cube_tile.draw(context, program_state, model_transform.times(Mat4.scale(1 / 4, 1 / 4, 1 / 20))
                 .times(Mat4.translation(-20.3, 6.5, 110)), this.materials.nose_tile);
