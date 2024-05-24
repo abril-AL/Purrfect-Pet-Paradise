@@ -1,7 +1,7 @@
 import { defs, tiny } from './examples/common.js';
 
 const {
-    Vector, Vector3, vec, vec3, vec4, color, hex_color, Matrix, Mat4, Light, Shape, Material, Scene,
+    Vector, Vector3, vec, vec3, vec4, color, hex_color, Matrix, Mat4, Light, Shape, Material, Texture, Scene,
 } = tiny;
 
 class Cube extends Shape {
@@ -258,25 +258,25 @@ class Cat extends Shape {
 
 }
 
-class Brush extends Shape{
+class Brush extends Shape {
     constructor() {
         super("position", "normal");
-            this.head = new defs.Capped_Cylinder(15, 15);
-            this.handle = new defs.Rounded_Capped_Cylinder(15, 15);
-            this.brush = new defs.Closed_Cone(15,15);
+        this.head = new defs.Capped_Cylinder(15, 15);
+        this.handle = new defs.Rounded_Capped_Cylinder(15, 15);
+        this.brush = new defs.Closed_Cone(15, 15);
     }
 
-    draw_brush(context, program_state, model_transform, material){
+    draw_brush(context, program_state, model_transform, material) {
         model_transform = model_transform.times(Mat4.scale(2, 2, .5));
         this.head.draw(context, program_state, model_transform, material);
 
-        model_transform = model_transform.times(Mat4.scale(1/2, 3/2, 1/3))
+        model_transform = model_transform.times(Mat4.scale(1 / 2, 3 / 2, 1 / 3))
             .times(Mat4.translation(0, -1, 0))
         this.handle.draw(context, program_state, model_transform, material);
-        model_transform = model_transform.times(Mat4.scale(2, 1/3, 2))
+        model_transform = model_transform.times(Mat4.scale(2, 1 / 3, 2))
             .times(Mat4.translation(-.4, 4, 1));
 
-        model_transform = model_transform.times(Mat4.scale(1/4, 1/4, 2))
+        model_transform = model_transform.times(Mat4.scale(1 / 4, 1 / 4, 2))
             .times(Mat4.translation(.5, .5, .5))
         this.brush.draw(context, program_state, model_transform, material);
         model_transform = model_transform.times(Mat4.translation(2.25, 0, 0))
@@ -313,12 +313,23 @@ class Base_Scene extends Scene {
         this.shapes = {
             'cube': new Cube(),
             'cat': new Cat(),
+            sq_tile: new defs.Square(),
+            cube_tile: new defs.Cube(),
+            sphere: new defs.Subdivision_Sphere(4),
             'brush': new Brush(),
         };
 
+        const bump = new defs.Fake_Bump_Map(1);
+        const textured = new defs.Textured_Phong(1);
         this.materials = {
             plastic: new Material(new defs.Phong_Shader(),
                 { ambient: .4, diffusivity: .6, color: hex_color("#ffffff") }),
+            green_grass: new Material(bump,
+                { ambient: .5, texture: new Texture("assets/green-grass-512x512.png") }),
+            sky_blue: new Material(textured,
+                { ambient: .5, texture: new Texture("assets/sky.png") }),
+            sun: new Material(textured,
+                { ambient: 1, texture: new Texture("assets/sun_softer.png") }),
             test: new Material(new defs.Phong_Shader(),
                 { ambient: 1, diffusivity: .6, color: hex_color("#786f80") })
         };
@@ -357,17 +368,17 @@ export class Project extends Base_Scene {
 
     display(context, program_state) {
         super.display(context, program_state);
+        const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         let model_transform = Mat4.identity();
-        const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000
 
         if (this.cat_sit == false) {
             this.shapes.cat.draw_stand(context, program_state, model_transform, this.materials.test);
             if (this.brush_out) {
-            model_transform = model_transform.times(Mat4.translation(-5, 4, -10))
-                .times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
-            let brush_transform = model_transform.copy()
-            brush_transform = brush_transform.times(Mat4.translation(0, 5*Math.cos(t), 0));
-            this.shapes.brush.draw_brush(context, program_state, brush_transform, this.materials.test);
+                model_transform = model_transform.times(Mat4.translation(-5, 4, -10))
+                    .times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
+                let brush_transform = model_transform.copy()
+                brush_transform = brush_transform.times(Mat4.translation(0, 5 * Math.cos(t), 0));
+                this.shapes.brush.draw_brush(context, program_state, brush_transform, this.materials.test);
             }
         }
         else {
@@ -377,6 +388,45 @@ export class Project extends Base_Scene {
 
         // model_transform = model_transform.times(Mat4.translation(15, 0, 0))
         // this.shapes.brush.draw_brush(context, program_state, model_transform, this.materials.test);
+
+        this.shapes.cat.draw(context, program_state, model_transform, this.materials.plastic);
+
+        // Center ground tile
+        model_transform = Mat4.identity();
+        model_transform = model_transform.times(Mat4.translation(0, -4, 0)).times(Mat4.scale(20, 1, 20));
+        this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.green_grass);
+
+        // Left ground tile
+        model_transform = Mat4.identity();
+        model_transform = model_transform.times(Mat4.translation(-40, -4, 0)).times(Mat4.scale(20, 1, 20));
+        this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.green_grass);
+
+        // Right ground tile
+        model_transform = Mat4.identity();
+        model_transform = model_transform.times(Mat4.translation(40, -4, 0)).times(Mat4.scale(20, 1, 20));
+        this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.green_grass);
+
+        // Center sky tile
+        model_transform = Mat4.identity();
+        model_transform = model_transform.times(Mat4.translation(0, 10, -50)).times(Mat4.scale(50, 50, 1));
+        this.shapes.sq_tile.draw(context, program_state, model_transform, this.materials.sky_blue);
+
+        // Left sky tiles
+        model_transform = Mat4.identity();
+        model_transform = model_transform.times(Mat4.translation(-100, 10, -50)).times(Mat4.scale(50, 50, 1));
+        this.shapes.sq_tile.draw(context, program_state, model_transform, this.materials.sky_blue);
+
+        // Right sky tiles
+        model_transform = Mat4.identity();
+        model_transform = model_transform.times(Mat4.translation(100, 10, -50)).times(Mat4.scale(50, 50, 1));
+        this.shapes.sq_tile.draw(context, program_state, model_transform, this.materials.sky_blue);
+
+        const sun_scale = 2 + 1 * (Math.sin(Math.PI * t / 5));
+        const sun_color_fraction = (sun_scale - 1) / 2; // Normalize between 0 and 1
+        const sun_color = color(1, sun_color_fraction, 0, 1); // Transition from red to yellow
+        let sun_transform = Mat4.identity();
+        sun_transform = sun_transform.times(Mat4.translation(-6, 6, 0));
+        this.shapes.sphere.draw(context, program_state, sun_transform, this.materials.sun.override({ color: sun_color }));
 
     }
 }
