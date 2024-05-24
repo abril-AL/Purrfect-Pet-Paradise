@@ -195,7 +195,7 @@ class Cat extends Shape {
         this.back_left_leg = new Leg();
         this.back_right_leg = new Leg();
 
-        // Body 
+        // Body
         this.body = new Body();
 
         // Head
@@ -393,17 +393,17 @@ export class Project extends Base_Scene {
 
         // Center ground tile
         model_transform = Mat4.identity();
-        model_transform = model_transform.times(Mat4.translation(0, -4, 0)).times(Mat4.scale(20, 1, 20));
+        model_transform = model_transform.times(Mat4.translation(0, -8, 0)).times(Mat4.scale(20, 1, 20));
         this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.green_grass);
 
         // Left ground tile
         model_transform = Mat4.identity();
-        model_transform = model_transform.times(Mat4.translation(-40, -4, 0)).times(Mat4.scale(20, 1, 20));
+        model_transform = model_transform.times(Mat4.translation(-40, -8, 0)).times(Mat4.scale(20, 1, 20));
         this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.green_grass);
 
         // Right ground tile
         model_transform = Mat4.identity();
-        model_transform = model_transform.times(Mat4.translation(40, -4, 0)).times(Mat4.scale(20, 1, 20));
+        model_transform = model_transform.times(Mat4.translation(40, -8, 0)).times(Mat4.scale(20, 1, 20));
         this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.green_grass);
 
         // Center sky tile
@@ -425,7 +425,8 @@ export class Project extends Base_Scene {
         const sun_color_fraction = (sun_scale - 1) / 2; // Normalize between 0 and 1
         const sun_color = color(1, sun_color_fraction, 0, 1); // Transition from red to yellow
         let sun_transform = Mat4.identity();
-        sun_transform = sun_transform.times(Mat4.translation(-6, 6, 0));
+        sun_transform = sun_transform.times(Mat4.translation(-20, 10, -10));
+        sun_transform = sun_transform.times(Mat4.scale(2, 2, 2));
         this.shapes.sphere.draw(context, program_state, sun_transform, this.materials.sun.override({ color: sun_color }));
 
     }
