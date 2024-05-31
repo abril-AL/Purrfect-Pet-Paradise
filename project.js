@@ -393,6 +393,10 @@ class Base_Scene extends Scene {
                 { ambient: .4, diffusivity: .6, color: hex_color("#000000") }),
             cat_grey: new Material(new defs.Phong_Shader(),
                 { ambient: .4, diffusivity: .6, color: hex_color("#808080") }),
+            cat_white: new Material(new defs.Phong_Shader(),
+                { ambient: .4, diffusivity: .6, color: hex_color("#ffffff") }),
+            cat_orange: new Material(new defs.Phong_Shader(),
+                { ambient: .4, diffusivity: .6, color: hex_color("#e3910e") }),
 
             eye_b: new Material(bump,
                 { ambient: .5, texture: new Texture("assets/face.png") }),
@@ -408,7 +412,7 @@ class Base_Scene extends Scene {
         this.cat_sit = false;
         this.brush_out = false;
 
-        this.cat_color_set = ['b', 'g'];
+        this.cat_color_set = ['b', 'g', 'w', 'o',];
         this.cat_color = 'b';//default
         this.cat_color_index = 0;
     }
@@ -428,15 +432,14 @@ class Base_Scene extends Scene {
 
 export class Project extends Base_Scene {
     make_control_panel() {
-        /*this.key_triggered_button("Change Colors", ["c"], this.set_colors);
-        this.key_triggered_button("Outline", ["o"], () => {
-            this.outline = !this.outline;
-        });*/
+        this.key_triggered_button("Change Environment", ["e"], () => {
+            // change environment
+        });
         this.key_triggered_button("Sit", ["m"], () => {
             this.cat_sit = !this.cat_sit;
         });
         this.key_triggered_button("Changle Fur Color", ["g"], () => {
-            if (this.cat_color_index == 0) {
+            if (this.cat_color_index < 3) {
                 this.cat_color_index += 1;
             }
             else {
@@ -444,7 +447,6 @@ export class Project extends Base_Scene {
             }
             this.cat_color = this.cat_color_set[this.cat_color_index];
         });
-
         this.key_triggered_button("Brush", ["b"], () => {
             this.brush_out = !this.brush_out;
         });
@@ -457,6 +459,7 @@ export class Project extends Base_Scene {
 
         let cat_mat;
         let eye_texture;
+        // Cat color ( ugly code )
         if (this.cat_color == 'b') {
             cat_mat = this.materials.cat_black;
             eye_texture = this.materials.eye_b;
@@ -465,8 +468,14 @@ export class Project extends Base_Scene {
             cat_mat = this.materials.cat_grey;
             eye_texture = this.materials.eye_g;
         }
-        //add more colors later
-
+        if (this.cat_color == 'w') {
+            cat_mat = this.materials.cat_white;
+            eye_texture = this.materials.eye_b;
+        }
+        if (this.cat_color == 'o') {
+            cat_mat = this.materials.cat_orange;
+            eye_texture = this.materials.eye_g;
+        }
 
         if (this.cat_sit == false) {
             model_transform = model_transform.times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2));
@@ -494,14 +503,11 @@ export class Project extends Base_Scene {
             }
         }
         else {
-            // Sitting cat animation 
-            this.shapes.draw_sit(context, program_state, model_transform, this.materials.test);
+            // Sitting cat animation - might not have time for ! 
+            //this.shapes.draw_sit(context, program_state, model_transform, this.materials.test);
         }
 
-        // model_transform = model_transform.times(Mat4.translation(15, 0, 0))
-        // this.shapes.brush.draw_brush(context, program_state, model_transform, this.materials.test);
 
-        //this.shapes.cat.draw(context, program_state, model_transform, this.materials.plastic);
 
         // Center ground tile
         model_transform = Mat4.identity();
@@ -537,7 +543,7 @@ export class Project extends Base_Scene {
         const sun_color_fraction = (sun_scale - 1) / 2; // Normalize between 0 and 1
         const sun_color = color(1, sun_color_fraction, 0, 1); // Transition from red to yellow
         let sun_transform = Mat4.identity();
-        sun_transform = sun_transform.times(Mat4.translation(-20, 10, -10));
+        sun_transform = sun_transform.times(Mat4.translation(-20, 10, -35));
         sun_transform = sun_transform.times(Mat4.scale(2, 2, 2));
         this.shapes.sphere.draw(context, program_state, sun_transform, this.materials.sun.override({ color: sun_color }));
 
