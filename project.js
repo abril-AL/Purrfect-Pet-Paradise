@@ -1,4 +1,4 @@
-import { defs, tiny } from './examples/common.js';
+import { defs, tiny, } from './examples/common.js';
 
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Matrix, Mat4, Light, Shape, Material, Texture, Scene,
@@ -232,6 +232,63 @@ class Mouth extends Shape {
     }
 }
 
+class Cylinder extends Shape {
+    constructor(height = 1, radius = 1, segments = 32) {
+        super("position", "normal", "texture_coord");
+
+        const positions = [];
+        const normals = [];
+        const texture_coords = [];
+        const indices = [];
+
+        for (let i = 0; i <= segments; i++) {
+            const angle = (i / segments) * 2 * Math.PI;
+            const x = Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+
+            positions.push(vec3(x, height / 2, z));
+            normals.push(vec3(0, 1, 0));
+            texture_coords.push(vec(x / (2 * radius) + 0.5, z / (2 * radius) + 0.5));
+
+            positions.push(vec3(x, -height / 2, z));
+            normals.push(vec3(0, -1, 0));
+            texture_coords.push(vec(x / (2 * radius) + 0.5, z / (2 * radius) + 0.5));
+        }
+
+        for (let i = 0; i <= segments; i++) {
+            const angle = (i / segments) * 2 * Math.PI;
+            const x = Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+
+            positions.push(vec3(x, height / 2, z));
+            normals.push(vec3(x, 0, z).normalized());
+            texture_coords.push(vec(i / segments, 1));
+
+            positions.push(vec3(x, -height / 2, z));
+            normals.push(vec3(x, 0, z).normalized());
+            texture_coords.push(vec(i / segments, 0));
+        }
+
+        for (let i = 0; i < segments; i++) {
+            const top1 = i * 2;
+            const top2 = top1 + 2;
+            const bottom1 = top1 + 1;
+            const bottom2 = top2 + 1;
+
+            indices.push(top1, top2, 0);
+
+            indices.push(bottom2, bottom1, 1);
+
+            indices.push(top1 + 2 * (segments + 1), bottom1 + 2 * (segments + 1), top2 + 2 * (segments + 1));
+            indices.push(top2 + 2 * (segments + 1), bottom1 + 2 * (segments + 1), bottom2 + 2 * (segments + 1));
+        }
+
+        this.arrays.position = positions;
+        this.arrays.normal = normals;
+        this.arrays.texture_coord = texture_coords;
+        this.indices = indices;
+    }
+}
 
 class Cat extends Shape {
     constructor() {
@@ -305,7 +362,6 @@ class Cat extends Shape {
 
 }
 
-
 class Brush extends Shape {
     constructor() {
         super("position", "normal");
@@ -365,30 +421,24 @@ class Base_Scene extends Scene {
             cube_tile: new defs.Cube(),
             sphere: new defs.Subdivision_Sphere(4),
             'brush': new Brush(),
+            'bowl': new Cylinder(),
         };
 
         const bump = new defs.Fake_Bump_Map(1);
         const textured = new defs.Textured_Phong(1);
         this.materials = {
-            plastic: new Material(new defs.Phong_Shader(),
-                { ambient: .4, diffusivity: .6, color: hex_color("#ffffff") }),
+
+            // Outside Environment
             green_grass: new Material(bump,
                 { ambient: .5, texture: new Texture("assets/green-grass-512x512.png") }),
             sky_blue: new Material(textured,
                 { ambient: .5, texture: new Texture("assets/sky.png") }),
             sun: new Material(textured,
                 { ambient: 1, texture: new Texture("assets/sun_softer.png") }),
-            test: new Material(new defs.Phong_Shader(),
-                { ambient: 1, diffusivity: .6, color: hex_color("#41004d") }),
-            cat_body: new Material(bump,
-                { ambient: .5, texture: new Texture("assets/cat_body.png") }),
-            cat_general: new Material(bump,
-                { ambient: .5, texture: new Texture("assets/cat_general.png") }),
-            cat_head: new Material(bump,
-                { ambient: .5, texture: new Texture("assets/cat_head.png") }),
-            cat_mouth: new Material(bump,
-                { ambient: .5, texture: new Texture("assets/cat_head.png") }),
+            fence: new Material(bump,
+                { ambient: 1, texture: new Texture("assets/fence.png") }),
 
+            // Cat Textures    
             cat_black: new Material(new defs.Phong_Shader(),
                 { ambient: .4, diffusivity: .6, color: hex_color("#000000") }),
             cat_grey: new Material(new defs.Phong_Shader(),
@@ -397,7 +447,6 @@ class Base_Scene extends Scene {
                 { ambient: .4, diffusivity: .6, color: hex_color("#ffffff") }),
             cat_orange: new Material(new defs.Phong_Shader(),
                 { ambient: .4, diffusivity: .6, color: hex_color("#e3910e") }),
-
             eye_b: new Material(bump,
                 { ambient: .5, diffusivity: .1, specularity: 0.1, texture: new Texture("assets/black_face.jpg") }),
             eye_g: new Material(bump,
@@ -406,33 +455,34 @@ class Base_Scene extends Scene {
                 { ambient: .5, diffusivity: .1, specularity: 0.1, texture: new Texture("assets/white_face.png") }),
             eye_o: new Material(bump,
                 { ambient: .5, diffusivity: .1, specularity: 0.1, texture: new Texture("assets/orange_face.png") }),
-
             nose_tile: new Material(bump,
                 { ambient: .5, texture: new Texture("assets/nose.png") }),
 
+            // Other
             heart: new Material(bump,
                 { ambient: 1, texture: new Texture("assets/heart.png") }),
+            test: new Material(new defs.Phong_Shader(),
+                { ambient: 1, diffusivity: .6, color: hex_color("#41004d") }),
+            plastic: new Material(new defs.Phong_Shader(),
+                { ambient: .4, diffusivity: .6, color: hex_color("#ffffff") }),
 
-            fence: new Material(bump,
-                { ambient: 1, texture: new Texture("assets/fence.png") }),
-
+            // Inside Environment
             wall: new Material(bump,
                 { ambient: 1, texture: new Texture("assets/wall.jpg") }),
-
             plant: new Material(bump,
                 { ambient: .8, diffusivity: .4, specularity: 0.4, texture: new Texture("assets/plant.png") }),
-
             floor: new Material(bump,
                 { ambient: .8, diffusivity: .4, specularity: 0.4, texture: new Texture("assets/floor.jpg") }),
-
             painting: new Material(bump,
                 { ambient: .8, diffusivity: .4, specularity: 0.4, texture: new Texture("assets/painting.jpg") }),
 
-
+            // Space Environment
             star_bk: new Material(bump,
                 { ambient: 1, texture: new Texture("assets/star_bk.jpg") }),
             moon: new Material(bump,
                 { ambient: 1, texture: new Texture("assets/moon.jpg") }),
+            earth: new Material(textured,
+                { ambient: 1, texture: new Texture("assets/earth.png") }),
         };
 
         this.cat_sit = false;
@@ -443,14 +493,16 @@ class Base_Scene extends Scene {
         this.cat_color_index = 0;
 
         this.envr_set = ['outside', 'inside', 'space'];
-        this.envr = 'inside';//default
-        this.envr_index = 1;
+        this.envr = 'outside';//default
+        this.envr_index = 0;
+
+        this.cat_feed = false;
     }
 
     display(context, program_state) {
         if (!context.scratchpad.controls) {
             this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
-            program_state.set_camera(/*Mat4.rotation(Math.PI / 6, 0, -1, 0).times*/(Mat4.translation(3, -2, -30)));
+            program_state.set_camera(Mat4.translation(3, -2, -30));
         }
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, 1, 100);
@@ -486,6 +538,10 @@ export class Project extends Base_Scene {
         this.new_line();
         this.key_triggered_button("Brush", ["b"], () => {
             this.brush_out = !this.brush_out;
+        });
+        this.new_line();
+        this.key_triggered_button("Feef", ["h"], () => {
+            this.cat_feed = !this.cat_feed;
         });
     }
 
@@ -538,10 +594,8 @@ export class Project extends Base_Scene {
                 this.shapes.cube_tile.draw(context, program_state, model_transform.times(Mat4.scale(1 / 2, 1 / 2, 0)).times(Mat4.translation(-9, -2, 3)), this.materials.heart);
 
             }
-        }
-        else {
-            // Sitting cat animation - might not have time for ! 
-            //this.shapes.draw_sit(context, program_state, model_transform, this.materials.test);
+        } else if (this.cat_feed == true) {
+            this.shapes.bowl.draw(context, program_state, model_transform, this.materials.test);
         }
 
         if (this.envr == 'outside') {
@@ -647,6 +701,10 @@ export class Project extends Base_Scene {
                     this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(20 * i, 20, -50)).times(Mat4.scale(10, 1, 10)), this.materials.moon);
                 }
             }
+            model_transform = Mat4.identity();
+            let earth_transform = model_transform.times(Mat4.rotation(-t / 40, 0, 0, 1));
+            earth_transform = earth_transform.times(Mat4.scale(2, 2, 2)).times(Mat4.translation(-10, 5, -12)); // Translate to the desired point
+            this.shapes.sphere.draw(context, program_state, earth_transform, this.materials.earth);
         }
     }
 }
