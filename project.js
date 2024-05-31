@@ -399,9 +399,14 @@ class Base_Scene extends Scene {
                 { ambient: .4, diffusivity: .6, color: hex_color("#e3910e") }),
 
             eye_b: new Material(bump,
-                { ambient: .5, texture: new Texture("assets/face.png") }),
+                { ambient: .5, diffusivity: .1, specularity: 0.1, texture: new Texture("assets/black_face.jpg") }),
             eye_g: new Material(bump,
-                { ambient: .5, texture: new Texture("assets/grey_face.png") }),
+                { ambient: .5, diffusivity: .1, specularity: 0.1, texture: new Texture("assets/grey_face.png") }),
+            eye_w: new Material(bump,
+                { ambient: .5, diffusivity: .1, specularity: 0.1, texture: new Texture("assets/white_face.png") }),
+            eye_o: new Material(bump,
+                { ambient: .5, diffusivity: .1, specularity: 0.1, texture: new Texture("assets/orange_face.png") }),
+
             nose_tile: new Material(bump,
                 { ambient: .5, texture: new Texture("assets/nose.png") }),
 
@@ -413,20 +418,20 @@ class Base_Scene extends Scene {
         this.brush_out = false;
 
         this.cat_color_set = ['b', 'g', 'w', 'o',];
-        this.cat_color = 'b';//default
-        this.cat_color_index = 0;
+        this.cat_color = 'w';//default
+        this.cat_color_index = 2;
     }
 
     display(context, program_state) {
         if (!context.scratchpad.controls) {
             this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
-            program_state.set_camera(/*Mat4.rotation(Math.PI / 6, 0, -1, 0).times*/(Mat4.translation(3, -2, -20)));
+            program_state.set_camera(/*Mat4.rotation(Math.PI / 6, 0, -1, 0).times*/(Mat4.translation(3, -2, -30)));
         }
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, 1, 100);
 
-        const light_position = vec4(-15, 10, 10, 1);
-        program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 100000)];
+        const light_position = vec4(-20, 30, 0, 0);
+        program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 10000000)];
     }
 }
 
@@ -459,7 +464,7 @@ export class Project extends Base_Scene {
 
         let cat_mat;
         let eye_texture;
-        // Cat color ( ugly code )
+        // Cat color 
         if (this.cat_color == 'b') {
             cat_mat = this.materials.cat_black;
             eye_texture = this.materials.eye_b;
@@ -470,11 +475,11 @@ export class Project extends Base_Scene {
         }
         if (this.cat_color == 'w') {
             cat_mat = this.materials.cat_white;
-            eye_texture = this.materials.eye_b;
+            eye_texture = this.materials.eye_w;
         }
         if (this.cat_color == 'o') {
             cat_mat = this.materials.cat_orange;
-            eye_texture = this.materials.eye_g;
+            eye_texture = this.materials.eye_o;
         }
 
         if (this.cat_sit == false) {
@@ -483,11 +488,11 @@ export class Project extends Base_Scene {
                 cat_mat, cat_mat, cat_mat,
                 cat_mat, cat_mat, cat_mat);//fix paramaters later
             //eyes 
-            this.shapes.cube_tile.draw(context, program_state, model_transform.times(Mat4.scale(2.2, 2, 0.1))
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(2.2, 2, 0.1))
                 .times(Mat4.translation(-2.3, 1, 45)), eye_texture);
             //nose
-            this.shapes.cube_tile.draw(context, program_state, model_transform.times(Mat4.scale(1 / 4, 1 / 4, 1 / 20))
-                .times(Mat4.translation(-20.3, 6.5, 110)), this.materials.nose_tile);
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(1 / 3, 1 / 3, 1 / (20 / 3)))
+                .times(Mat4.translation(-15.5, 4.4, 37)).times(Mat4.scale(1.2, 1.2, 1.2)), this.materials.nose_tile);
 
             if (this.brush_out) {
                 model_transform = model_transform.times(Mat4.translation(-5, 4, -10))
