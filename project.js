@@ -379,7 +379,7 @@ class Base_Scene extends Scene {
             sun: new Material(textured,
                 { ambient: 1, texture: new Texture("assets/sun_softer.png") }),
             test: new Material(new defs.Phong_Shader(),
-                { ambient: 1, diffusivity: .6, color: hex_color("#786f80") }),
+                { ambient: 1, diffusivity: .6, color: hex_color("#41004d") }),
             cat_body: new Material(bump,
                 { ambient: .5, texture: new Texture("assets/cat_body.png") }),
             cat_general: new Material(bump,
@@ -415,6 +415,18 @@ class Base_Scene extends Scene {
 
             fence: new Material(bump,
                 { ambient: 1, texture: new Texture("assets/fence.png") }),
+
+            wall: new Material(bump,
+                { ambient: 1, texture: new Texture("assets/wall.jpg") }),
+
+            plant: new Material(bump,
+                { ambient: .8, diffusivity: .4, specularity: 0.4, texture: new Texture("assets/plant.png") }),
+
+            floor: new Material(bump,
+                { ambient: .8, diffusivity: .4, specularity: 0.4, texture: new Texture("assets/floor.jpg") }),
+
+            painting: new Material(bump,
+                { ambient: .8, diffusivity: .4, specularity: 0.4, texture: new Texture("assets/painting.jpg") }),
         };
 
         this.cat_sit = false;
@@ -425,8 +437,8 @@ class Base_Scene extends Scene {
         this.cat_color_index = 0;
 
         this.envr_set = ['outside', 'inside', 'space'];
-        this.envr = 'outside';//default
-        this.envr_index = 0;
+        this.envr = 'inside';//default
+        this.envr_index = 1;
     }
 
     display(context, program_state) {
@@ -495,7 +507,7 @@ export class Project extends Base_Scene {
         }
 
         if (this.cat_sit == false) {
-            model_transform = model_transform.times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2));
+            model_transform = Mat4.identity().times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2));
             this.shapes.cat.draw_stand(context, program_state, model_transform,
                 cat_mat, cat_mat, cat_mat,
                 cat_mat, cat_mat, cat_mat);//fix paramaters later
@@ -570,22 +582,39 @@ export class Project extends Base_Scene {
                 model_transform = model_transform.times(Mat4.translation((i * 5) - 60, -4, -20)).times(Mat4.scale(3, 3, 0));
                 this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.fence);
             }
-
-            // Left ground tile
-            model_transform = Mat4.identity();
-            model_transform = model_transform.times(Mat4.translation(-40, -8, 0)).times(Mat4.scale(20, 1, 20));
-            this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.fence);
-
-            // Right ground tile
-            model_transform = Mat4.identity();
-            model_transform = model_transform.times(Mat4.translation(40, -8, 0)).times(Mat4.scale(20, 1, 20));
-            this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.fence);
-
-
-
         }
         if (this.envr == 'inside') {
+            // Back Walls
+            model_transform = Mat4.identity().times(Mat4.translation(-40, 3, 20))
 
+            for (let i = 0; i < 4; i++) {
+                this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(40 * i, 10, -50)).times(Mat4.scale(20, 20, 1)), this.materials.wall);
+            }
+
+            // Floors
+            model_transform = model_transform.times(Mat4.translation(-16, -31, 10))
+            for (let i = 0; i < 10; i++) {
+                this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(20 * i, 20, -50)).times(Mat4.scale(10, 1, 10)), this.materials.floor);
+            }
+            model_transform = model_transform.times(Mat4.translation(0, 0, 20.1))
+            for (let i = 0; i < 10; i++) {
+                this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(20 * i, 20, -50)).times(Mat4.scale(10, 1, 10)), this.materials.floor);
+            }
+            for (let i = 0; i < 3; i++) {
+                model_transform = model_transform.times(Mat4.translation(0, 0, 20.1))
+                for (let i = 0; i < 10; i++) {
+                    this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(20 * i, 20, -50)).times(Mat4.scale(10, 1, 10)), this.materials.floor);
+                }
+            }
+
+            // Plant
+            model_transform = Mat4.identity()
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(14, -1, -28)).times(Mat4.scale(6, 6, 0.01)), this.materials.plant);
+
+            // Wall Painting
+            model_transform = Mat4.identity()
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-12, 10, -28)).times(Mat4.scale(5, 5, 1)), this.materials.test.override({ color: hex_color("#6B2503") }));
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-12, 10, -27.3)).times(Mat4.scale(4.2, 4.2, 1)), this.materials.painting);
         }
     }
 }
