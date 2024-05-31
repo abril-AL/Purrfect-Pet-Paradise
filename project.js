@@ -427,6 +427,12 @@ class Base_Scene extends Scene {
 
             painting: new Material(bump,
                 { ambient: .8, diffusivity: .4, specularity: 0.4, texture: new Texture("assets/painting.jpg") }),
+
+
+            star_bk: new Material(bump,
+                { ambient: 1, texture: new Texture("assets/star_bk.jpg") }),
+            moon: new Material(bump,
+                { ambient: 1, texture: new Texture("assets/moon.jpg") }),
         };
 
         this.cat_sit = false;
@@ -464,9 +470,10 @@ export class Project extends Base_Scene {
             }
             this.envr = this.envr_set[this.envr_index];
         });
-        this.key_triggered_button("Sit", ["m"], () => {
+        /*this.key_triggered_button("Sit", ["m"], () => {
             this.cat_sit = !this.cat_sit;
-        });
+        });*/
+        this.new_line();
         this.key_triggered_button("Changle Fur Color", ["g"], () => {
             if (this.cat_color_index < 3) {
                 this.cat_color_index += 1;
@@ -476,6 +483,7 @@ export class Project extends Base_Scene {
             }
             this.cat_color = this.cat_color_set[this.cat_color_index];
         });
+        this.new_line();
         this.key_triggered_button("Brush", ["b"], () => {
             this.brush_out = !this.brush_out;
         });
@@ -615,6 +623,30 @@ export class Project extends Base_Scene {
             model_transform = Mat4.identity()
             this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-12, 10, -28)).times(Mat4.scale(5, 5, 1)), this.materials.test.override({ color: hex_color("#6B2503") }));
             this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-12, 10, -27.3)).times(Mat4.scale(4.2, 4.2, 1)), this.materials.painting);
+        }
+        if (this.envr == 'space') {
+            // Back Walls
+            model_transform = Mat4.identity().times(Mat4.translation(-40, 3, 20))
+
+            for (let i = 0; i < 4; i++) {
+                this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(40 * i, 10, -50)).times(Mat4.scale(20, 20, 1)), this.materials.star_bk);
+            }
+
+            // Floors
+            model_transform = model_transform.times(Mat4.translation(-16, -31, 10))
+            for (let i = 0; i < 10; i++) {
+                this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(20 * i, 20, -50)).times(Mat4.scale(10, 1, 10)), this.materials.moon);
+            }
+            model_transform = model_transform.times(Mat4.translation(0, 0, 20.1))
+            for (let i = 0; i < 10; i++) {
+                this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(20 * i, 20, -50)).times(Mat4.scale(10, 1, 10)), this.materials.moon);
+            }
+            for (let i = 0; i < 3; i++) {
+                model_transform = model_transform.times(Mat4.translation(0, 0, 20.1))
+                for (let i = 0; i < 10; i++) {
+                    this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(20 * i, 20, -50)).times(Mat4.scale(10, 1, 10)), this.materials.moon);
+                }
+            }
         }
     }
 }
