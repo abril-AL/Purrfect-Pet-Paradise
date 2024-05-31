@@ -412,14 +412,21 @@ class Base_Scene extends Scene {
 
             heart: new Material(bump,
                 { ambient: 1, texture: new Texture("assets/heart.png") }),
+
+            fence: new Material(bump,
+                { ambient: 1, texture: new Texture("assets/fence.png") }),
         };
 
         this.cat_sit = false;
         this.brush_out = false;
 
         this.cat_color_set = ['b', 'g', 'w', 'o',];
-        this.cat_color = 'w';//default
-        this.cat_color_index = 2;
+        this.cat_color = 'b';//default
+        this.cat_color_index = 0;
+
+        this.envr_set = ['outside', 'inside', 'space'];
+        this.envr = 'outside';//default
+        this.envr_index = 0;
     }
 
     display(context, program_state) {
@@ -438,7 +445,12 @@ class Base_Scene extends Scene {
 export class Project extends Base_Scene {
     make_control_panel() {
         this.key_triggered_button("Change Environment", ["e"], () => {
-            // change environment
+            if (this.envr_index < 2) {
+                this.envr_index += 1;
+            } else {
+                this.envr_index = 0
+            }
+            this.envr = this.envr_set[this.envr_index];
         });
         this.key_triggered_button("Sit", ["m"], () => {
             this.cat_sit = !this.cat_sit;
@@ -512,45 +524,68 @@ export class Project extends Base_Scene {
             //this.shapes.draw_sit(context, program_state, model_transform, this.materials.test);
         }
 
+        if (this.envr == 'outside') {
+
+            // Center ground tile
+            model_transform = Mat4.identity();
+            model_transform = model_transform.times(Mat4.translation(0, -8, 0)).times(Mat4.scale(20, 1, 20));
+            this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.green_grass);
+
+            // Left ground tile
+            model_transform = Mat4.identity();
+            model_transform = model_transform.times(Mat4.translation(-40, -8, 0)).times(Mat4.scale(20, 1, 20));
+            this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.green_grass);
+
+            // Right ground tile
+            model_transform = Mat4.identity();
+            model_transform = model_transform.times(Mat4.translation(40, -8, 0)).times(Mat4.scale(20, 1, 20));
+            this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.green_grass);
+
+            // Center sky tile
+            model_transform = Mat4.identity();
+            model_transform = model_transform.times(Mat4.translation(0, 10, -50)).times(Mat4.scale(50, 50, 1));
+            this.shapes.sq_tile.draw(context, program_state, model_transform, this.materials.sky_blue);
+
+            // Left sky tiles
+            model_transform = Mat4.identity();
+            model_transform = model_transform.times(Mat4.translation(-100, 10, -50)).times(Mat4.scale(50, 50, 1));
+            this.shapes.sq_tile.draw(context, program_state, model_transform, this.materials.sky_blue);
+
+            // Right sky tiles
+            model_transform = Mat4.identity();
+            model_transform = model_transform.times(Mat4.translation(100, 10, -50)).times(Mat4.scale(50, 50, 1));
+            this.shapes.sq_tile.draw(context, program_state, model_transform, this.materials.sky_blue);
+
+            const sun_scale = 2 + 1 * (Math.sin(Math.PI * t / 5));
+            const sun_color_fraction = (sun_scale - 1) / 2; // Normalize between 0 and 1
+            const sun_color = color(1, sun_color_fraction, 0, 1); // Transition from red to yellow
+            let sun_transform = Mat4.identity();
+            sun_transform = sun_transform.times(Mat4.translation(-20, 10, -35));
+            sun_transform = sun_transform.times(Mat4.scale(2, 2, 2));
+            this.shapes.sphere.draw(context, program_state, sun_transform, this.materials.sun.override({ color: sun_color }));
+
+            // Fence 
+            for (let i = 1; i < 25; i++) {
+                model_transform = Mat4.identity();
+                model_transform = model_transform.times(Mat4.translation((i * 5) - 60, -4, -20)).times(Mat4.scale(3, 3, 0));
+                this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.fence);
+            }
+
+            // Left ground tile
+            model_transform = Mat4.identity();
+            model_transform = model_transform.times(Mat4.translation(-40, -8, 0)).times(Mat4.scale(20, 1, 20));
+            this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.fence);
+
+            // Right ground tile
+            model_transform = Mat4.identity();
+            model_transform = model_transform.times(Mat4.translation(40, -8, 0)).times(Mat4.scale(20, 1, 20));
+            this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.fence);
 
 
-        // Center ground tile
-        model_transform = Mat4.identity();
-        model_transform = model_transform.times(Mat4.translation(0, -8, 0)).times(Mat4.scale(20, 1, 20));
-        this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.green_grass);
 
-        // Left ground tile
-        model_transform = Mat4.identity();
-        model_transform = model_transform.times(Mat4.translation(-40, -8, 0)).times(Mat4.scale(20, 1, 20));
-        this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.green_grass);
+        }
+        if (this.envr == 'inside') {
 
-        // Right ground tile
-        model_transform = Mat4.identity();
-        model_transform = model_transform.times(Mat4.translation(40, -8, 0)).times(Mat4.scale(20, 1, 20));
-        this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.green_grass);
-
-        // Center sky tile
-        model_transform = Mat4.identity();
-        model_transform = model_transform.times(Mat4.translation(0, 10, -50)).times(Mat4.scale(50, 50, 1));
-        this.shapes.sq_tile.draw(context, program_state, model_transform, this.materials.sky_blue);
-
-        // Left sky tiles
-        model_transform = Mat4.identity();
-        model_transform = model_transform.times(Mat4.translation(-100, 10, -50)).times(Mat4.scale(50, 50, 1));
-        this.shapes.sq_tile.draw(context, program_state, model_transform, this.materials.sky_blue);
-
-        // Right sky tiles
-        model_transform = Mat4.identity();
-        model_transform = model_transform.times(Mat4.translation(100, 10, -50)).times(Mat4.scale(50, 50, 1));
-        this.shapes.sq_tile.draw(context, program_state, model_transform, this.materials.sky_blue);
-
-        const sun_scale = 2 + 1 * (Math.sin(Math.PI * t / 5));
-        const sun_color_fraction = (sun_scale - 1) / 2; // Normalize between 0 and 1
-        const sun_color = color(1, sun_color_fraction, 0, 1); // Transition from red to yellow
-        let sun_transform = Mat4.identity();
-        sun_transform = sun_transform.times(Mat4.translation(-20, 10, -35));
-        sun_transform = sun_transform.times(Mat4.scale(2, 2, 2));
-        this.shapes.sphere.draw(context, program_state, sun_transform, this.materials.sun.override({ color: sun_color }));
-
+        }
     }
 }
