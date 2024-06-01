@@ -612,11 +612,13 @@ export class Project extends Base_Scene {
         this.new_line();
         this.key_triggered_button("Brush", ["b"], () => {
             this.brush_out = !this.brush_out;
+            this.cat_feed = false;
             this.happiness_level += 0.5;
         });
         this.new_line();
         this.key_triggered_button("Feed", ["h"], () => {
             this.cat_feed = !this.cat_feed;
+            this.brush_out = false;
             this.happiness_level += 0.5;
         });
         this.new_line();
