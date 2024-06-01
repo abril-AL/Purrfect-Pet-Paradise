@@ -1,4 +1,4 @@
-import { defs, tiny, } from './examples/common.js';
+import { defs, tiny, Torus } from './examples/common.js';
 
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Matrix, Mat4, Light, Shape, Material, Texture, Scene,
@@ -77,6 +77,47 @@ class small_Cube extends Shape {
             16, 17, 18, 16, 18, 19, // Right face
             20, 21, 22, 20, 22, 23 // Left face
         );
+    }
+}
+
+class Circle extends Shape {
+    constructor(radius = 1, segments = 32) {
+        super("position", "normal", "texture_coord");
+
+        const positions = [];
+        const normals = [];
+        const texture_coords = [];
+        const indices = [];
+
+        // Center point of the circle
+        positions.push(vec3(0, 0, 0));
+        normals.push(vec3(0, 1, 0));
+        texture_coords.push(vec(0.5, 0.5));
+
+        // Outer vertices of the circle
+        for (let i = 0; i <= segments; i++) {
+            const angle = (i / segments) * 2 * Math.PI;
+            const x = Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+
+            positions.push(vec3(x, 0, z));
+            normals.push(vec3(0, 1, 0));
+            texture_coords.push(vec(x / 2 + 0.5, z / 2 + 0.5));
+        }
+
+        // Indices to form triangles
+        for (let i = 1; i <= segments; i++) {
+            indices.push(0, i, i + 1);
+        }
+
+        this.arrays.position = positions;
+        this.arrays.normal = normals;
+        this.arrays.texture_coord = texture_coords;
+        this.indices = indices;
+    }
+
+    draw(context, program_state, model_transform, material) {
+        super.draw(context, program_state, model_transform, material);
     }
 }
 
@@ -232,64 +273,6 @@ class Mouth extends Shape {
     }
 }
 
-class Cylinder extends Shape {
-    constructor(height = 1, radius = 1, segments = 32) {
-        super("position", "normal", "texture_coord");
-
-        const positions = [];
-        const normals = [];
-        const texture_coords = [];
-        const indices = [];
-
-        for (let i = 0; i <= segments; i++) {
-            const angle = (i / segments) * 2 * Math.PI;
-            const x = Math.cos(angle) * radius;
-            const z = Math.sin(angle) * radius;
-
-            positions.push(vec3(x, height / 2, z));
-            normals.push(vec3(0, 1, 0));
-            texture_coords.push(vec(x / (2 * radius) + 0.5, z / (2 * radius) + 0.5));
-
-            positions.push(vec3(x, -height / 2, z));
-            normals.push(vec3(0, -1, 0));
-            texture_coords.push(vec(x / (2 * radius) + 0.5, z / (2 * radius) + 0.5));
-        }
-
-        for (let i = 0; i <= segments; i++) {
-            const angle = (i / segments) * 2 * Math.PI;
-            const x = Math.cos(angle) * radius;
-            const z = Math.sin(angle) * radius;
-
-            positions.push(vec3(x, height / 2, z));
-            normals.push(vec3(x, 0, z).normalized());
-            texture_coords.push(vec(i / segments, 1));
-
-            positions.push(vec3(x, -height / 2, z));
-            normals.push(vec3(x, 0, z).normalized());
-            texture_coords.push(vec(i / segments, 0));
-        }
-
-        for (let i = 0; i < segments; i++) {
-            const top1 = i * 2;
-            const top2 = top1 + 2;
-            const bottom1 = top1 + 1;
-            const bottom2 = top2 + 1;
-
-            indices.push(top1, top2, 0);
-
-            indices.push(bottom2, bottom1, 1);
-
-            indices.push(top1 + 2 * (segments + 1), bottom1 + 2 * (segments + 1), top2 + 2 * (segments + 1));
-            indices.push(top2 + 2 * (segments + 1), bottom1 + 2 * (segments + 1), bottom2 + 2 * (segments + 1));
-        }
-
-        this.arrays.position = positions;
-        this.arrays.normal = normals;
-        this.arrays.texture_coord = texture_coords;
-        this.indices = indices;
-    }
-}
-
 class Cat extends Shape {
     constructor() {
         super("position", "normal");
@@ -360,6 +343,54 @@ class Cat extends Shape {
         model_transform = model_transform;
     }
 
+    draw_eating(context, program_state, model_transform, material, head_sin_transform) {
+
+        model_transform = model_transform.times(Mat4.translation(-5, -5, -5));
+        head_sin_transform = head_sin_transform.times(Mat4.translation(0, -2, 0));
+
+        // Legs
+        let leg_translation = 1.5;
+        let z_leg_separation = 9.5;
+
+        let front_left_leg_transform = model_transform.times(Mat4.translation(-leg_translation, 0, 2));
+        this.front_left_leg.draw(context, program_state, front_left_leg_transform, material);
+
+        let front_right_leg_transform = model_transform.times(Mat4.translation(leg_translation, 0, 2));
+        this.front_right_leg.draw(context, program_state, front_right_leg_transform, material);
+
+        let back_left_leg_transform = model_transform.times(Mat4.translation(-leg_translation, 0, -z_leg_separation));
+        this.back_left_leg.draw(context, program_state, back_left_leg_transform, material);
+
+        let back_right_leg_transform = model_transform.times(Mat4.translation(leg_translation, 0, -z_leg_separation));
+        this.back_right_leg.draw(context, program_state, back_right_leg_transform, material);
+
+        // Tail
+        this.tail_1.draw(context, program_state, model_transform.times(Mat4.translation(0, 6, -13.5)).times(Mat4.scale(1, 1, 3)), material);
+        this.tail_2.draw(context, program_state, model_transform.times(Mat4.translation(0, 5, -15.5)), material);
+        this.tail_3.draw(context, program_state, model_transform.times(Mat4.translation(0, 4, -16.5)), material);
+        this.tail_4.draw(context, program_state, model_transform.times(Mat4.translation(0, 3, -19.5)).times(Mat4.scale(1, 1, 5)), material);
+
+        // Body
+        let body_transform = model_transform
+            .times(Mat4.translation(0, 5, -3.5))  // Move to the hinge point
+            .times(Mat4.rotation(2 * Math.PI / 180, 1, 0, 0))  // Rotate the body downwards
+            .times(Mat4.translation(0, -5, 3.5))  // Move back to the original position
+            .times(Mat4.translation(0, 4.3, -3));  // Offset for body height
+        this.body.draw(context, program_state, body_transform, material);
+
+
+        // These Will Tilt to Simulate Eating:
+        // Head
+        this.head.draw(context, program_state, head_sin_transform.times(Mat4.translation(0, 7, 6.5)).times(Mat4.translation(-5, -5, -5)), material);
+        this.mouth.draw(context, program_state, head_sin_transform.times(Mat4.translation(0, 6, 10)).times(Mat4.translation(-5, -5, -5)), material);
+        // Ears
+        this.right_ear.draw(context, program_state, head_sin_transform.times(Mat4.translation(2, 9.5, 4.5)).times(Mat4.translation(-5, -5, -5)).times(Mat4.scale(1, 1, 2)), material);
+        this.left_ear.draw(context, program_state, head_sin_transform.times(Mat4.translation(-2, 9.5, 4.5)).times(Mat4.translation(-5, -5, -5)).times(Mat4.scale(1, 1, 2)), material);
+
+
+        model_transform = Mat4.identity();
+    }
+
 }
 
 class Brush extends Shape {
@@ -410,6 +441,24 @@ class Brush extends Shape {
     }
 }
 
+class Bowl extends Shape {
+    constructor() {
+        super("position", "normal");
+        this.bowl = new Torus(25, 25);
+        this.kibble = new Circle();
+    }
+    draw(context, program_state, model_transform, material, material_2) {
+        model_transform = model_transform.times(Mat4.translation(-5, -6, 7)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(4, 4, 1))
+        for (let i = 0; i < 23; i++) {
+            this.bowl.draw(context, program_state, model_transform.times(Mat4.translation(0, 0, i * 0.07)), material);
+        }
+        model_transform = Mat4.identity()
+        model_transform = model_transform.times(Mat4.translation(-2.5, -6.3, 2.7)).times(Mat4.scale(1.5, 1.5, 1.5))
+        this.kibble.draw(context, program_state, model_transform, material_2);
+    }
+
+}
+
 class Base_Scene extends Scene {
     constructor() {
         super();
@@ -421,7 +470,7 @@ class Base_Scene extends Scene {
             cube_tile: new defs.Cube(),
             sphere: new defs.Subdivision_Sphere(4),
             'brush': new Brush(),
-            'bowl': new Cylinder(),
+            'bowl': new Bowl(),
         };
 
         const bump = new defs.Fake_Bump_Map(1);
@@ -461,10 +510,28 @@ class Base_Scene extends Scene {
             // Other
             heart: new Material(bump,
                 { ambient: 1, texture: new Texture("assets/heart.png") }),
+            upset: new Material(bump,
+                { ambient: 1, texture: new Texture("assets/upset.png") }),
             test: new Material(new defs.Phong_Shader(),
                 { ambient: 1, diffusivity: .6, color: hex_color("#41004d") }),
             plastic: new Material(new defs.Phong_Shader(),
                 { ambient: .4, diffusivity: .6, color: hex_color("#ffffff") }),
+            kibble: new Material(textured,
+                { ambient: 1, texture: new Texture("assets/kibble.jpg") }),
+            wet_food: new Material(textured,
+                { ambient: 1, texture: new Texture("assets/wet_food.jpg") }),
+            bone: new Material(textured,
+                { ambient: 1, texture: new Texture("assets/bone.jpg") }),
+            bowl_color: new Material(new defs.Phong_Shader(),
+                { ambient: .4, diffusivity: .6, color: hex_color("#d1001f") }),
+            meter_red: new Material(new defs.Phong_Shader(),
+                { ambient: 1, diffusivity: .6, color: hex_color("#ff0000") }),
+            meter_yellow: new Material(new defs.Phong_Shader(),
+                { ambient: 1, diffusivity: .6, color: hex_color("#efcc00") }),
+            meter_green: new Material(new defs.Phong_Shader(),
+                { ambient: 1, diffusivity: .6, color: hex_color("#008000") }),
+            happy: new Material(bump,
+                { ambient: 1, texture: new Texture("assets/happy.jpg") }),
 
             // Inside Environment
             wall: new Material(bump,
@@ -497,6 +564,13 @@ class Base_Scene extends Scene {
         this.envr_index = 0;
 
         this.cat_feed = false;
+
+        this.food_set = ['kibble', 'wet', 'bone'];
+        this.food = 'kibble';//default
+        this.food_index = 0;
+
+        this.happiness_level = 100;
+        this.happy_i = 0.1;
     }
 
     display(context, program_state) {
@@ -538,11 +612,50 @@ export class Project extends Base_Scene {
         this.new_line();
         this.key_triggered_button("Brush", ["b"], () => {
             this.brush_out = !this.brush_out;
+            this.happiness_level += 0.5;
         });
         this.new_line();
-        this.key_triggered_button("Feef", ["h"], () => {
+        this.key_triggered_button("Feed", ["h"], () => {
             this.cat_feed = !this.cat_feed;
+            this.happiness_level += 0.5;
         });
+        this.new_line();
+        this.key_triggered_button("Change Food Type", ["t"], () => {
+            this.happiness_level += 0.5;
+            if (this.food_index < 2) {
+                this.food_index += 1;
+            } else {
+                this.food_index = 0
+            }
+            this.food = this.food_set[this.food_index];
+        });
+    }
+
+    updateHappinessLevel() {
+        // Decrease the happiness level over time
+        if (this.happiness_level > 0) {
+            this.happiness_level -= this.happy_i; // Adjust the decrease rate as needed
+        }
+        if (this.happiness_level < 0) {
+            this.happiness_level = 0;
+        }
+        if (this.happiness_level >= 100) {
+            this.happiness_level = 100;
+        }
+        console.log(this.happiness_level)
+    }
+    getHappinessColor(happiness_level) {
+        // Define the color thresholds
+        let red_threshold = 25; // Below this, the color will be red
+
+        // Calculate the color based on the happiness level
+        if (happiness_level < red_threshold) {
+            return new Vector(1, 0, 0, 1); // Red color
+        } else {
+            // Calculate a gradient color from red to green based on the happiness level
+            let green_value = (happiness_level - red_threshold) / (100 - red_threshold);
+            return new Vector(1 - green_value, green_value, 0, 1); // Gradient color from red to green
+        }
     }
 
     display(context, program_state) {
@@ -571,18 +684,19 @@ export class Project extends Base_Scene {
         }
 
         if (this.cat_sit == false) {
-            model_transform = Mat4.identity().times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2));
-            this.shapes.cat.draw_stand(context, program_state, model_transform,
-                cat_mat, cat_mat, cat_mat,
-                cat_mat, cat_mat, cat_mat);//fix paramaters later
-            //eyes 
-            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(2.2, 2, 0.1))
-                .times(Mat4.translation(-2.3, 1, 45)), eye_texture);
-            //nose
-            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(1 / 3, 1 / 3, 1 / (20 / 3)))
-                .times(Mat4.translation(-15.5, 4.4, 37)).times(Mat4.scale(1.2, 1.2, 1.2)), this.materials.nose_tile);
-
             if (this.brush_out) {
+                this.happy_i = -0.15;
+                model_transform = Mat4.identity().times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2));
+                this.shapes.cat.draw_stand(context, program_state, model_transform,
+                    cat_mat, cat_mat, cat_mat,
+                    cat_mat, cat_mat, cat_mat);//fix paramaters later
+                //eyes 
+                this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(2.2, 2, 0.1))
+                    .times(Mat4.translation(-2.3, 1, 45)), eye_texture);
+                //nose
+                this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(1 / 3, 1 / 3, 1 / (20 / 3)))
+                    .times(Mat4.translation(-15.5, 4.4, 37)).times(Mat4.scale(1.2, 1.2, 1.2)), this.materials.nose_tile);
+
                 model_transform = model_transform.times(Mat4.translation(-5, 4, -10))
                     .times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
                 let brush_transform = model_transform.copy()
@@ -593,10 +707,71 @@ export class Project extends Base_Scene {
                 model_transform = Mat4.identity();
                 this.shapes.cube_tile.draw(context, program_state, model_transform.times(Mat4.scale(1 / 2, 1 / 2, 0)).times(Mat4.translation(-9, -2, 3)), this.materials.heart);
 
+            } else if (this.cat_feed == true) {
+                this.happy_i = -0.1;
+                model_transform = Mat4.identity().times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2));
+
+                // Tilt Angle
+                let head_sin_transform = model_transform
+                    .times(Mat4.rotation((25 + 5 * (Math.sin(t))) * Math.PI / 100, 1, 0, 0));
+                this.shapes.cat.draw_eating(context, program_state, model_transform, cat_mat, head_sin_transform);
+                //eyes 
+                this.shapes.cube.draw(context, program_state, head_sin_transform.times(Mat4.translation(0, -2, 0)).times(Mat4.scale(2.2, 2, 0.1))
+                    .times(Mat4.translation(-2.3, 1, 45)), eye_texture);
+                //nose
+                this.shapes.cube.draw(context, program_state, head_sin_transform.times(Mat4.translation(0, -2, 0)).times(Mat4.scale(1 / 3, 1 / 3, 1 / (20 / 3)))
+                    .times(Mat4.translation(-15.5, 4.4, 37)).times(Mat4.scale(1.2, 1.2, 1.2)), this.materials.nose_tile);
+
+                // Bowl
+                let food_mat;
+                if (this.food == 'kibble') {
+                    this.happy_i = -0.1;
+                    food_mat = this.materials.kibble;
+                    this.shapes.cube_tile.draw(context, program_state, Mat4.identity().times(Mat4.scale(1 / 2, 1 / 2, 0)).times(Mat4.translation(-9, -2, 3)), this.materials.heart);
+                } else if (this.food == 'wet') {
+                    this.happy_i = -0.15;
+                    food_mat = this.materials.wet_food;
+                    this.shapes.cube_tile.draw(context, program_state, Mat4.identity().times(Mat4.scale(1 / 2, 1 / 2, 0)).times(Mat4.translation(-9, -2, 3)), this.materials.heart);
+                } else if (this.food == 'bone') {
+                    this.happy_i = 0.2;
+                    food_mat = this.materials.bone;
+                    this.shapes.cube_tile.draw(context, program_state, Mat4.identity().times(Mat4.scale(1 / 2, 1 / 2, 0.01)).times(Mat4.translation(-3, -3.2, 130)), this.materials.upset);
+                }
+                this.shapes.bowl.draw(context, program_state, model_transform, this.materials.bowl_color, food_mat);
+
+                model_transform = Mat4.identity();
+            } else {
+                this.happy_i = 0.16;
+
+                model_transform = Mat4.identity().times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2));
+                this.shapes.cat.draw_stand(context, program_state, model_transform,
+                    cat_mat, cat_mat, cat_mat,
+                    cat_mat, cat_mat, cat_mat);//fix paramaters later
+                //eyes 
+                this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(2.2, 2, 0.1))
+                    .times(Mat4.translation(-2.3, 1, 45)), eye_texture);
+                //nose
+                this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(1 / 3, 1 / 3, 1 / (20 / 3)))
+                    .times(Mat4.translation(-15.5, 4.4, 37)).times(Mat4.scale(1.2, 1.2, 1.2)), this.materials.nose_tile);
             }
-        } else if (this.cat_feed == true) {
-            this.shapes.bowl.draw(context, program_state, model_transform, this.materials.test);
+            this.happiness_level += 0.1;
+            let scale_factor = 4 * this.happiness_level / 100; // Assuming happiness_level ranges from 0 to 100
+            let cube_transform = (Mat4.scale(1, scale_factor, 1))      // Scale only along the y-axis
+
+            let color_level;
+            if (this.happiness_level <= 30) {
+                color_level = this.materials.meter_red;
+            } else if (this.happiness_level <= 50) {
+                color_level = this.materials.meter_yellow;
+            } else if (this.happiness_level <= 110) {
+                color_level = this.materials.meter_green;
+            }
+            let move_t = Mat4.translation(6, -6, -5);
+            this.shapes.cube.draw(context, program_state, move_t.times(Mat4.scale(1.2, 1.2, 1.2)), this.materials.happy)
+            this.shapes.cube.draw(context, program_state, Mat4.translation(6, -4.8, -5).times(cube_transform), color_level);
+            this.updateHappinessLevel();
         }
+
 
         if (this.envr == 'outside') {
 
@@ -645,7 +820,7 @@ export class Project extends Base_Scene {
                 this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.fence);
             }
         }
-        if (this.envr == 'inside') {
+        else if (this.envr == 'inside') {
             // Back Walls
             model_transform = Mat4.identity().times(Mat4.translation(-40, 3, 20))
 
@@ -662,23 +837,21 @@ export class Project extends Base_Scene {
             for (let i = 0; i < 10; i++) {
                 this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(20 * i, 20, -50)).times(Mat4.scale(10, 1, 10)), this.materials.floor);
             }
-            for (let i = 0; i < 3; i++) {
-                model_transform = model_transform.times(Mat4.translation(0, 0, 20.1))
-                for (let i = 0; i < 10; i++) {
-                    this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(20 * i, 20, -50)).times(Mat4.scale(10, 1, 10)), this.materials.floor);
-                }
+            model_transform = model_transform.times(Mat4.translation(0, 0, 20.1))
+            for (let i = 0; i < 10; i++) {
+                this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(20 * i, 20, -50)).times(Mat4.scale(10, 1, 10)), this.materials.floor);
             }
 
             // Plant
             model_transform = Mat4.identity()
-            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(14, -1, -28)).times(Mat4.scale(6, 6, 0.01)), this.materials.plant);
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(14, -1, -29)).times(Mat4.scale(6, 6, 0.01)), this.materials.plant);
 
             // Wall Painting
             model_transform = Mat4.identity()
-            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-12, 10, -28)).times(Mat4.scale(5, 5, 1)), this.materials.test.override({ color: hex_color("#6B2503") }));
-            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-12, 10, -27.3)).times(Mat4.scale(4.2, 4.2, 1)), this.materials.painting);
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-12, 10, -29)).times(Mat4.scale(5, 5, 1)), this.materials.test.override({ color: hex_color("#6B2503") }));
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-12, 10, -28.3)).times(Mat4.scale(4.2, 4.2, 1)), this.materials.painting);
         }
-        if (this.envr == 'space') {
+        else if (this.envr == 'space') {
             // Back Walls
             model_transform = Mat4.identity().times(Mat4.translation(-40, 3, 20))
 
