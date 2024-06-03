@@ -459,6 +459,87 @@ class Bowl extends Shape {
 
 }
 
+class Ball {
+    // **Body** can store and update the properties of a 3D body that incrementally
+    // moves from its previous place due to velocities.  It conforms to the
+    // approach outlined in the "Fix Your Timestep!" blog post by Glenn Fiedler.
+    constructor(shape, material, size) {
+        Object.assign(this,
+            {shape, material, size})
+    }
+
+    // (within some margin of distance).
+    static intersect_cube(p, margin = 0) {
+        return p.every(value => value >= -1 - margin && value <= 1 + margin)
+    }
+
+    static intersect_sphere(p, margin = 0) {
+        return p.dot(p) < 1 + margin;
+    }
+
+    emplace(location_matrix, linear_velocity, angular_velocity, spin_axis = vec3(0, 0, 0).randomized(1).normalized()) {                               // emplace(): assign the body's initial values, or overwrite them.
+        this.center = location_matrix.times(vec4(0, 0, 0, 1)).to3();
+        this.rotation = Mat4.translation(...this.center.times(-1)).times(location_matrix);
+        this.previous = {center: this.center.copy(), rotation: this.rotation.copy()};
+        // drawn_location gets replaced with an interpolated quantity:
+        this.drawn_location = location_matrix;
+        this.temp_matrix = Mat4.identity();
+        return Object.assign(this, {linear_velocity, angular_velocity, spin_axis})
+    }
+
+    advance(time_amount) {
+        // advance(): Perform an integration (the simplistic Forward Euler method) to
+        // advance all the linear and angular velocities one time-step forward.
+        this.previous = {center: this.center.copy(), rotation: this.rotation.copy()};
+        // Apply the velocities scaled proportionally to real time (time_amount):
+        // Linear velocity first, then angular:
+        this.center = this.center.plus(this.linear_velocity.times(time_amount));
+        this.rotation.pre_multiply(Mat4.rotation(time_amount * this.angular_velocity, ...this.spin_axis));
+    }
+
+    // The following are our various functions for testing a single point,
+    // p, against some analytically-known geometric volume formula
+
+    blend_rotation(alpha) {
+        // blend_rotation(): Just naively do a linear blend of the rotations, which looks
+        // ok sometimes but otherwise produces shear matrices, a wrong result.
+
+        // TODO:  Replace this function with proper quaternion blending, and perhaps
+        // store this.rotation in quaternion form instead for compactness.
+        return this.rotation.map((x, i) => vec4(...this.previous.rotation[i]).mix(x, alpha));
+    }
+
+    blend_state(alpha) {
+        // blend_state(): Compute the final matrix we'll draw using the previous two physical
+        // locations the object occupied.  We'll interpolate between these two states as
+        // described at the end of the "Fix Your Timestep!" blog post.
+        this.drawn_location = Mat4.translation(...this.previous.center.mix(this.center, alpha))
+            .times(this.blend_rotation(alpha))
+            .times(Mat4.scale(...this.size));
+    }
+
+    check_if_colliding(b, collider) {
+        // check_if_colliding(): Collision detection function.
+        // DISCLAIMER:  The collision method shown below is not used by anyone; it's just very quick
+        // to code.  Making every collision body an ellipsoid is kind of a hack, and looping
+        // through a list of discrete sphere points to see if the ellipsoids intersect is *really* a
+        // hack (there are perfectly good analytic expressions that can test if two ellipsoids
+        // intersect without discretizing them into points).
+        if (this == b)
+            return false;
+        // Nothing collides with itself.
+        // Convert sphere b to the frame where a is a unit sphere:
+        const T = this.inverse.times(b.drawn_location, this.temp_matrix);
+
+        const {intersect_test, points, leeway} = collider;
+        // For each vertex in that b, shift to the coordinate frame of
+        // a_inv*b.  Check if in that coordinate frame it penetrates
+        // the unit sphere at the origin.  Leave some leeway.
+        return points.arrays.position.some(p =>
+            intersect_test(T.times(p.to4(1)).to3(), leeway));
+    }
+}
+
 class Base_Scene extends Scene {
     constructor() {
         super();
@@ -473,6 +554,7 @@ class Base_Scene extends Scene {
             'bowl': new Bowl(),
         };
 
+        Object.assign(this, {time_accumulator: 0, time_scale: 1, t: 0, dt: 1 / 20, bodies: [], steps_taken: 0});
         const bump = new defs.Fake_Bump_Map(1);
         const textured = new defs.Textured_Phong(1);
         this.materials = {
@@ -554,6 +636,7 @@ class Base_Scene extends Scene {
 
         this.cat_sit = false;
         this.brush_out = false;
+        this.ball = false;
 
         this.cat_color_set = ['b', 'g', 'w', 'o',];
         this.cat_color = 'b';//default
@@ -573,6 +656,36 @@ class Base_Scene extends Scene {
         this.happy_i = 0.1;
     }
 
+    simulate(frame_time) {
+        // simulate(): Carefully advance time according to Glenn Fiedler's
+        // "Fix Your Timestep" blog post.
+        // This line gives ourselves a way to trick the simulator into thinking
+        // that the display framerate is running fast or slow:
+        frame_time = this.time_scale * frame_time;
+
+        // Avoid the spiral of death; limit the amount of time we will spend
+        // computing during this timestep if display lags:
+        this.time_accumulator += Math.min(frame_time, 0.1);
+        // Repeatedly step the simulation until we're caught up with this frame:
+        while (Math.abs(this.time_accumulator) >= this.dt) {
+            // Single step of the simulation for all bodies:
+            this.update_state(this.dt);
+            for (let b of this.bodies)
+                b.advance(this.dt);
+            // Following the advice of the article, de-couple
+            // our simulation time from our frame rate:
+            this.t += Math.sign(frame_time) * this.dt;
+            this.time_accumulator -= Math.sign(frame_time) * this.dt;
+            this.steps_taken++;
+        }
+        // Store an interpolation factor for how close our frame fell in between
+        // the two latest simulation time steps, so we can correctly blend the
+        // two latest states and display the result.
+        let alpha = this.time_accumulator / this.dt;
+        for (let b of this.bodies) b.blend_state(alpha);
+    }
+
+
     display(context, program_state) {
         if (!context.scratchpad.controls) {
             this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
@@ -583,6 +696,18 @@ class Base_Scene extends Scene {
 
         const light_position = vec4(-20, 30, 0, 0);
         program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 10000000)];
+
+        if (this.ball)
+            this.simulate(program_state.animation_delta_time);
+        // Draw each shape at its current location:
+        for (let b of this.bodies)
+            b.shape.draw(context, program_state, b.drawn_location, b.material);
+
+    }
+
+    update_state(dt)      // update_state(): Your subclass of Simulation has to override this abstract function.
+    {
+        throw "Override this"
     }
 }
 
@@ -600,7 +725,7 @@ export class Project extends Base_Scene {
             this.cat_sit = !this.cat_sit;
         });*/
         this.new_line();
-        this.key_triggered_button("Changle Fur Color", ["g"], () => {
+        this.key_triggered_button("Change Fur Color", ["g"], () => {
             if (this.cat_color_index < 3) {
                 this.cat_color_index += 1;
             }
@@ -613,12 +738,14 @@ export class Project extends Base_Scene {
         this.key_triggered_button("Brush", ["b"], () => {
             this.brush_out = !this.brush_out;
             this.cat_feed = false;
+            this.ball = false;
             this.happiness_level += 0.5;
         });
         this.new_line();
         this.key_triggered_button("Feed", ["h"], () => {
             this.cat_feed = !this.cat_feed;
             this.brush_out = false;
+            this.ball = false;
             this.happiness_level += 0.5;
         });
         this.new_line();
@@ -630,6 +757,13 @@ export class Project extends Base_Scene {
                 this.food_index = 0
             }
             this.food = this.food_set[this.food_index];
+        });
+        this.new_line();
+        this.key_triggered_button("Play with ball", ["x"], () => {
+           this.ball = !this.ball;
+           this.brush_out = false;
+           this.cat_feed = false;
+           this.happiness_level += 0.5
         });
     }
 
@@ -657,6 +791,33 @@ export class Project extends Base_Scene {
             // Calculate a gradient color from red to green based on the happiness level
             let green_value = (happiness_level - red_threshold) / (100 - red_threshold);
             return new Vector(1 - green_value, green_value, 0, 1); // Gradient color from red to green
+        }
+    }
+
+    random_color() {
+        return this.materials.plastic.override(color(.6, .6 * Math.random(), .6 * Math.random(), 1));
+    }
+
+    update_state(dt) {
+        // update_state():  Override the base time-stepping code to say what this particular
+        // scene should do to its bodies every frame -- including applying forces.
+        // Generate additional moving bodies if there ever aren't enough:
+        while (this.bodies.length < 1)
+            this.bodies.push(new Ball(this.shapes.sphere, this.random_color(), vec3(1, 1, 1))
+                .emplace(Mat4.translation(-2.5, 15, 3),
+                    vec3(0, -1, 0).times(3), 0));
+
+        for (let b of this.bodies) {
+            // Gravity on Earth, where 1 unit in world space = 1 meter:
+            b.linear_velocity[1] += dt * -9.8;
+            // If about to fall through floor, reverse y velocity:
+            if (b.center[1] < -6 && b.linear_velocity[1] < 0)
+                b.linear_velocity[1] *= -.8;
+        }
+        // Delete bodies that stop or stray too far away:
+        //this.bodies = this.bodies.filter(b => b.center.norm() < 50 && b.linear_velocity.norm() > 1/2);
+        if (this.bodies[0].linear_velocity[1] < 0.01 && this.bodies[0].center[1] < -5.95){
+            this.bodies[0].linear_velocity[1] = 0;
         }
     }
 
@@ -742,7 +903,23 @@ export class Project extends Base_Scene {
                 this.shapes.bowl.draw(context, program_state, model_transform, this.materials.bowl_color, food_mat);
 
                 model_transform = Mat4.identity();
-            } else {
+            }else if (this.ball){
+
+                this.happy_i -= 0.1;
+
+                model_transform = Mat4.identity().times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2));
+                this.shapes.cat.draw_stand(context, program_state, model_transform,
+                    cat_mat, cat_mat, cat_mat,
+                    cat_mat, cat_mat, cat_mat);//fix paramaters later
+                //eyes
+                this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(2.2, 2, 0.1))
+                    .times(Mat4.translation(-2.3, 1, 45)), eye_texture);
+                //nose
+                this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(1 / 3, 1 / 3, 1 / (20 / 3)))
+                    .times(Mat4.translation(-15.5, 4.4, 37)).times(Mat4.scale(1.2, 1.2, 1.2)), this.materials.nose_tile);
+
+            }
+            else {
                 this.happy_i = 0.16;
 
                 model_transform = Mat4.identity().times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2));
@@ -756,6 +933,11 @@ export class Project extends Base_Scene {
                 this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(1 / 3, 1 / 3, 1 / (20 / 3)))
                     .times(Mat4.translation(-15.5, 4.4, 37)).times(Mat4.scale(1.2, 1.2, 1.2)), this.materials.nose_tile);
             }
+
+            if(this.ball == false){
+                this.bodies = []
+            }
+
             this.happiness_level += 0.1;
             let scale_factor = 4 * this.happiness_level / 100; // Assuming happiness_level ranges from 0 to 100
             let cube_transform = (Mat4.scale(1, scale_factor, 1))      // Scale only along the y-axis

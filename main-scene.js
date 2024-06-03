@@ -36,7 +36,7 @@ Object.assign(defs,
     { Text_Demo },
     { Transforms_Sandbox },
     { Assignment3 },
-    { Project }
+    { Project },
 );
 
 // ******************** End extra step

@@ -1,9 +1,12 @@
-import {defs, tiny} from './common.js';
+import {defs, tiny, Torus} from './common.js';
 
 // Pull these names into this module's scope for convenience:
-const {vec3, unsafe3, vec4, color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
+const {
+    Vector, Vector3, vec, vec3, unsafe3, vec4, color, hex_color, Matrix, Shader, Mat4, Light, Shape, Material, Texture, Scene,
+} = tiny;
 
-export class Body {
+
+export class Ball {
     // **Body** can store and update the properties of a 3D body that incrementally
     // moves from its previous place due to velocities.  It conforms to the
     // approach outlined in the "Fix Your Timestep!" blog post by Glenn Fiedler.
@@ -84,7 +87,6 @@ export class Body {
     }
 }
 
-
 export class Simulation extends Scene {
     // **Simulation** manages the stepping of simulation time.  Subclass it when making
     // a Scene that is a physics demo.  This technique is careful to totally decouple
@@ -156,7 +158,6 @@ export class Simulation extends Scene {
     }
 }
 
-
 export class Test_Data {
     // **Test_Data** pre-loads some Shapes and Textures that other Scenes can borrow.
     constructor() {
@@ -185,7 +186,6 @@ export class Test_Data {
         return shape_list[shape_names[~~(shape_names.length * Math.random())]]
     }
 }
-
 
 /*export class Inertia_Demo extends Simulation {
     // ** Inertia_Demo** demonstration: This scene lets random initial momentums
@@ -249,7 +249,7 @@ export class Test_Data {
                                      </p><p>The forward Euler method is used to advance the linear and angular velocities of each shape one time-step.  The velocities are not subject to any forces here, but just a downward acceleration.  Velocities are also constrained to not take any objects under the ground plane.
                                      </p><p>This scene extends class Simulation, which carefully manages stepping simulation time for any scenes that subclass it.  It totally decouples the whole simulation from the frame rate, following the suggestions in the blog post <a href=\"https://gafferongames.com/post/fix_your_timestep/\" target=\"blank\">\"Fix Your Timestep\"</a> by Glenn Fielder.  Buttons allow you to speed up and slow down time to show that the simulation's answers do not change.</p>`;
     }
-} */
+}*/
 
 export class Inertia_Demo extends Simulation {
     // ** Inertia_Demo** demonstration: This scene lets random initial momentums
@@ -276,7 +276,7 @@ export class Inertia_Demo extends Simulation {
         // scene should do to its bodies every frame -- including applying forces.
         // Generate additional moving bodies if there ever aren't enough:
         while (this.bodies.length < 1)
-            this.bodies.push(new Body(this.ball, this.random_color(), vec3(1, 1 + Math.random(), 1))
+            this.bodies.push(new Ball(this.ball , this.random_color(), vec3(1, 1 + Math.random(), 1))
                 .emplace(Mat4.translation(0, 0, 0),
                     vec3(0, -1, 0).times(3), 0));
 
@@ -318,7 +318,6 @@ export class Inertia_Demo extends Simulation {
                                      </p><p>This scene extends class Simulation, which carefully manages stepping simulation time for any scenes that subclass it.  It totally decouples the whole simulation from the frame rate, following the suggestions in the blog post <a href=\"https://gafferongames.com/post/fix_your_timestep/\" target=\"blank\">\"Fix Your Timestep\"</a> by Glenn Fielder.  Buttons allow you to speed up and slow down time to show that the simulation's answers do not change.</p>`;
     }
 }
-
 
 export class Collision_Demo extends Simulation {
     // **Collision_Demo** demonstration: Detect when some flying objects
