@@ -555,6 +555,7 @@ class Base_Scene extends Scene {
         };
 
         Object.assign(this, {time_accumulator: 0, time_scale: 1, t: 0, dt: 1 / 20, bodies: [], steps_taken: 0});
+        this.direction = 0;
         const bump = new defs.Fake_Bump_Map(1);
         const textured = new defs.Textured_Phong(1);
         this.materials = {
@@ -760,10 +761,11 @@ export class Project extends Base_Scene {
         });
         this.new_line();
         this.key_triggered_button("Play with ball", ["x"], () => {
-           this.ball = !this.ball;
-           this.brush_out = false;
-           this.cat_feed = false;
-           this.happiness_level += 0.5
+            this.direction = Math.floor(Math.random() * 2);
+            this.ball = !this.ball;
+            this.brush_out = false;
+            this.cat_feed = false;
+            this.happiness_level += 0.5
         });
     }
 
@@ -798,14 +800,23 @@ export class Project extends Base_Scene {
         return this.materials.plastic.override(color(.6, .6 * Math.random(), .6 * Math.random(), 1));
     }
 
+    //function for ball bouncing following gravity (i.e. physics-based)
     update_state(dt) {
         // update_state():  Override the base time-stepping code to say what this particular
         // scene should do to its bodies every frame -- including applying forces.
         // Generate additional moving bodies if there ever aren't enough:
-        while (this.bodies.length < 1)
-            this.bodies.push(new Ball(this.shapes.sphere, this.random_color(), vec3(1, 1, 1))
-                .emplace(Mat4.translation(-2.5, 15, 3),
-                    vec3(0, -1, 0).times(3), 0));
+        while (this.bodies.length < 1) {
+            if (this.direction == 0) {
+                this.bodies.push(new Ball(this.shapes.sphere, this.random_color(), vec3(1, 1, 1))
+                    .emplace(Mat4.translation(-2.5, 15, 3),
+                        vec3(Math.random(), -1, Math.random()).times(3), 0));
+            }
+            else{
+                this.bodies.push(new Ball(this.shapes.sphere, this.random_color(), vec3(1, 1, 1))
+                    .emplace(Mat4.translation(-2.5, 15, 3),
+                        vec3(-Math.random(), -1, Math.random()).times(3), 0));
+            }
+        }
 
         for (let b of this.bodies) {
             // Gravity on Earth, where 1 unit in world space = 1 meter:
