@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="d64af0eb-6f0e-4388-9019-859f828da9ec" name="Changes" comment="Brush now brushes cat">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project.js" beforeDir="false" afterPath="$PROJECT_DIR$/project.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,12 +21,12 @@
     &quot;assignee&quot;: &quot;gjzev&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/abril-AL/Purrfect-Pet-Paradise.git&quot;,
-    &quot;accountId&quot;: &quot;67e18bb7-fef8-44d5-8d1d-78216535f159&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/abril-AL/Purrfect-Pet-Paradise.git",
+    "accountId": "383c807b-7664-4e7c-b716-ccbc3440090e"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2
 }</component>
@@ -78,7 +77,10 @@
       <workItem from="1716863232781" duration="19000" />
       <workItem from="1716863262472" duration="7000" />
       <workItem from="1717366477252" duration="11727000" />
-      <workItem from="1717642844367" duration="49000" />
+      <workItem from="1717642844367" duration="1314000" />
+      <workItem from="1717652038069" duration="174000" />
+      <workItem from="1717652252250" duration="4272000" />
+      <workItem from="1717658085468" duration="618000" />
     </task>
     <task id="LOCAL-00001" summary="Added Brush Class in project.js">
       <option name="closed" value="true" />
