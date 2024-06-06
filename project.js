@@ -1,3 +1,4 @@
+
 import { defs, tiny, Torus } from './examples/common.js';
 
 const {
@@ -331,11 +332,18 @@ class Cat extends Shape {
         this.left_ear.draw(context, program_state, model_transform.times(Mat4.translation(-2, 9.5, 4.5)).times(Mat4.scale(1, 1, 2)), ear_material);
 
         // Tail
-        this.tail_1.draw(context, program_state, model_transform.times(Mat4.translation(0, 6, -13.5)).times(Mat4.scale(1, 1, 3)), tail_material);
-        this.tail_2.draw(context, program_state, model_transform.times(Mat4.translation(0, 5, -15.5)), tail_material);
-        this.tail_3.draw(context, program_state, model_transform.times(Mat4.translation(0, 4, -16.5)), tail_material);
-        this.tail_4.draw(context, program_state, model_transform.times(Mat4.translation(0, 3, -19.5)).times(Mat4.scale(1, 1, 5)), tail_material);
+        let tail_transform = model_transform.times(Mat4.translation(0,8, -12.5));
+        for (let i = 0; i < 5; i++) {
 
+            this.tail_4.draw(context, program_state, tail_transform, tail_material);
+            let t2 = program_state.animation_time / 1000;
+            let w = 2*Math.PI/3;
+            let angle =  0.04 *Math.PI *Math.sin (w*t2);
+            tail_transform = tail_transform.times(Mat4.translation(0,1, 0));
+            tail_transform = tail_transform.times(Mat4.translation(0,-1,0));
+            tail_transform = tail_transform.times(Mat4.rotation(angle,0,0,1));
+            tail_transform = tail_transform.times(Mat4.translation(0,1,0));
+        }
         model_transform = Mat4.identity();
     }
 
@@ -365,10 +373,18 @@ class Cat extends Shape {
         this.back_right_leg.draw(context, program_state, back_right_leg_transform, material);
 
         // Tail
-        this.tail_1.draw(context, program_state, model_transform.times(Mat4.translation(0, 6, -13.5)).times(Mat4.scale(1, 1, 3)), material);
-        this.tail_2.draw(context, program_state, model_transform.times(Mat4.translation(0, 5, -15.5)), material);
-        this.tail_3.draw(context, program_state, model_transform.times(Mat4.translation(0, 4, -16.5)), material);
-        this.tail_4.draw(context, program_state, model_transform.times(Mat4.translation(0, 3, -19.5)).times(Mat4.scale(1, 1, 5)), material);
+        let tail_transform2 = model_transform.times(Mat4.translation(0,8, -12.5));
+        for (let i = 0; i < 5; i++) {
+
+            this.tail_4.draw(context, program_state, tail_transform2, material);
+            let t3 = program_state.animation_time / 1000;
+            let w3 = 2*Math.PI/3;
+            let angle =  0.04 *Math.PI *Math.sin (w3*t3);
+            tail_transform2 = tail_transform2.times(Mat4.translation(0,1, 0));
+            tail_transform2 = tail_transform2.times(Mat4.translation(0,-1,0));
+            tail_transform2 = tail_transform2.times(Mat4.rotation(angle,0,0,1));
+            tail_transform2 = tail_transform2.times(Mat4.translation(0,1,0));
+        }
 
         // Body
         let body_transform = model_transform
@@ -572,7 +588,7 @@ class Base_Scene extends Scene {
             fence: new Material(bump,
                 { ambient: 1, texture: new Texture("assets/fence.png") }),
 
-            // Cat Textures    
+            // Cat Textures
             cat_black: new Material(new defs.Phong_Shader(),
                 { ambient: .4, diffusivity: .6, color: hex_color("#000000") }),
             cat_grey: new Material(new defs.Phong_Shader(),
@@ -844,7 +860,7 @@ export class Project extends Base_Scene {
 
         let cat_mat;
         let eye_texture;
-        // Cat color 
+        // Cat color
         if (this.cat_color == 'b') {
             cat_mat = this.materials.cat_black;
             eye_texture = this.materials.eye_b;
@@ -870,7 +886,7 @@ export class Project extends Base_Scene {
                 this.shapes.cat.draw_stand(context, program_state, model_transform,
                     cat_mat, cat_mat, cat_mat,
                     cat_mat, cat_mat, cat_mat);//fix paramaters later
-                //eyes 
+                //eyes
                 this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(2.2, 2, 0.1))
                     .times(Mat4.translation(-2.3, 1, 45)), eye_texture);
                 //nose
@@ -896,7 +912,7 @@ export class Project extends Base_Scene {
                 let head_sin_transform = model_transform
                     .times(Mat4.rotation((25 + 5 * (Math.sin(t))) * Math.PI / 100, 1, 0, 0));
                 this.shapes.cat.draw_eating(context, program_state, model_transform, cat_mat, head_sin_transform);
-                //eyes 
+                //eyes
                 this.shapes.cube.draw(context, program_state, head_sin_transform.times(Mat4.translation(0, -2, 0)).times(Mat4.scale(2.2, 2, 0.1))
                     .times(Mat4.translation(-2.3, 1, 45)), eye_texture);
                 //nose
@@ -957,7 +973,7 @@ export class Project extends Base_Scene {
                 this.shapes.cat.draw_stand(context, program_state, model_transform,
                     cat_mat, cat_mat, cat_mat,
                     cat_mat, cat_mat, cat_mat);//fix paramaters later
-                //eyes 
+                //eyes
                 this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(2.2, 2, 0.1))
                     .times(Mat4.translation(-2.3, 1, 45)), eye_texture);
                 //nose
@@ -1032,7 +1048,7 @@ export class Project extends Base_Scene {
             sun_transform = sun_transform.times(Mat4.scale(2, 2, 2));
             this.shapes.sphere.draw(context, program_state, sun_transform, this.materials.sun.override({ color: sun_color }));
 
-            // Fence 
+            // Fence
             for (let i = 1; i < 25; i++) {
                 model_transform = Mat4.identity();
                 model_transform = model_transform.times(Mat4.translation((i * 5) - 60, -4, -20)).times(Mat4.scale(3, 3, 0));
@@ -1100,3 +1116,4 @@ export class Project extends Base_Scene {
         }
     }
 }
+
