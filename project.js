@@ -839,7 +839,7 @@ export class Project extends Base_Scene {
 
     display(context, program_state) {
         super.display(context, program_state);
-        const t = program_state.animation_time / 1000, cdt = program_state.animation_delta_time / 100;
+        let t = program_state.animation_time / 1000, cdt = program_state.animation_delta_time / 100;
         let model_transform = Mat4.identity();
 
         let cat_mat;
@@ -864,6 +864,7 @@ export class Project extends Base_Scene {
 
         if (this.cat_sit == false) {
             if (this.brush_out) {
+                t = program_state.animation_time / 1000
                 this.happy_i = -0.15;
                 model_transform = Mat4.identity().times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2));
                 this.shapes.cat.draw_stand(context, program_state, model_transform,
@@ -887,6 +888,7 @@ export class Project extends Base_Scene {
                 this.shapes.cube_tile.draw(context, program_state, model_transform.times(Mat4.scale(1 / 2, 1 / 2, 0)).times(Mat4.translation(-9, -2, 3)), this.materials.heart);
 
             } else if (this.cat_feed == true) {
+                t = program_state.animation_time / 1000
                 this.happy_i = -0.1;
                 model_transform = Mat4.identity().times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2));
 
@@ -920,7 +922,7 @@ export class Project extends Base_Scene {
 
                 model_transform = Mat4.identity();
             }else if (this.ball){
-
+                t = program_state.animation_time / 1000
                 this.happy_i -= 0.1;
                 let rot = Math.atan(Math.sqrt(Math.pow(this.bodies[0].center[0],2))/Math.sqrt(Math.pow(this.bodies[0].center[2],2)));
 
@@ -965,6 +967,9 @@ export class Project extends Base_Scene {
 
             if(this.ball == false){
                 this.bodies = []
+            }
+
+            if(this.ball == false && this.cat_feed == false && this.brush_out == false){
                 program_state.animation_time = 0
             }
 
