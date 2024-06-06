@@ -481,7 +481,7 @@ class Ball {
     // approach outlined in the "Fix Your Timestep!" blog post by Glenn Fiedler.
     constructor(shape, material, size) {
         Object.assign(this,
-            {shape, material, size})
+            { shape, material, size })
     }
 
     // (within some margin of distance).
@@ -496,17 +496,17 @@ class Ball {
     emplace(location_matrix, linear_velocity, angular_velocity, spin_axis = vec3(0, 0, 0).randomized(1).normalized()) {                               // emplace(): assign the body's initial values, or overwrite them.
         this.center = location_matrix.times(vec4(0, 0, 0, 1)).to3();
         this.rotation = Mat4.translation(...this.center.times(-1)).times(location_matrix);
-        this.previous = {center: this.center.copy(), rotation: this.rotation.copy()};
+        this.previous = { center: this.center.copy(), rotation: this.rotation.copy() };
         // drawn_location gets replaced with an interpolated quantity:
         this.drawn_location = location_matrix;
         this.temp_matrix = Mat4.identity();
-        return Object.assign(this, {linear_velocity, angular_velocity, spin_axis})
+        return Object.assign(this, { linear_velocity, angular_velocity, spin_axis })
     }
 
     advance(time_amount) {
         // advance(): Perform an integration (the simplistic Forward Euler method) to
         // advance all the linear and angular velocities one time-step forward.
-        this.previous = {center: this.center.copy(), rotation: this.rotation.copy()};
+        this.previous = { center: this.center.copy(), rotation: this.rotation.copy() };
         // Apply the velocities scaled proportionally to real time (time_amount):
         // Linear velocity first, then angular:
         this.center = this.center.plus(this.linear_velocity.times(time_amount));
@@ -547,7 +547,7 @@ class Ball {
         // Convert sphere b to the frame where a is a unit sphere:
         const T = this.inverse.times(b.drawn_location, this.temp_matrix);
 
-        const {intersect_test, points, leeway} = collider;
+        const { intersect_test, points, leeway } = collider;
         // For each vertex in that b, shift to the coordinate frame of
         // a_inv*b.  Check if in that coordinate frame it penetrates
         // the unit sphere at the origin.  Leave some leeway.
@@ -570,7 +570,7 @@ class Base_Scene extends Scene {
             'bowl': new Bowl(),
         };
 
-        Object.assign(this, {time_accumulator: 0, time_scale: 1, t: 0, dt: 1 / 20, bodies: [], steps_taken: 0});
+        Object.assign(this, { time_accumulator: 0, time_scale: 1, t: 0, dt: 1 / 20, bodies: [], steps_taken: 0 });
         this.direction = 0;
         this.xdir = 0;
         this.zdir = 0;
@@ -831,7 +831,7 @@ export class Project extends Base_Scene {
                     .emplace(Mat4.translation(-2.5, 15, 3),
                         vec3(this.xdir, -1, this.zdir).times(3), 0));
             }
-            else{
+            else {
                 this.bodies.push(new Ball(this.shapes.sphere, this.random_color(), vec3(1, 1, 1))
                     .emplace(Mat4.translation(-2.5, 15, 3),
                         vec3(-this.xdir, -1, this.zdir).times(3), 0));
@@ -847,7 +847,7 @@ export class Project extends Base_Scene {
         }
         // Delete bodies that stop or stray too far away:
         //this.bodies = this.bodies.filter(b => b.center.norm() < 50 && b.linear_velocity.norm() > 1/2);
-        if (this.bodies[0].linear_velocity[1] < 0.01 && this.bodies[0].center[1] < -5.95){
+        if (this.bodies[0].linear_velocity[1] < 0.01 && this.bodies[0].center[1] < -5.95) {
             this.bodies[0].linear_velocity[1] = 0;
         }
 
@@ -937,14 +937,14 @@ export class Project extends Base_Scene {
                 this.shapes.bowl.draw(context, program_state, model_transform, this.materials.bowl_color, food_mat);
 
                 model_transform = Mat4.identity();
-            }else if (this.ball){
+            } else if (this.ball) {
                 t = program_state.animation_time / 1000
                 this.happy_i -= 0.1;
-                let rot = Math.atan(Math.sqrt(Math.pow(this.bodies[0].center[0],2))/Math.sqrt(Math.pow(this.bodies[0].center[2],2)));
+                let rot = Math.atan(Math.sqrt(Math.pow(this.bodies[0].center[0], 2)) / Math.sqrt(Math.pow(this.bodies[0].center[2], 2)));
 
                 if (this.direction == 0) {
                     model_transform = Mat4.identity().times(Mat4.rotation(rot, 0, 1, 0))
-                    model_transform = model_transform.times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2+t*4));
+                    model_transform = model_transform.times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2 + t * 4));
                     this.shapes.cat.draw_stand(context, program_state, model_transform,
                         cat_mat, cat_mat, cat_mat,
                         cat_mat, cat_mat, cat_mat);
@@ -953,9 +953,9 @@ export class Project extends Base_Scene {
                     this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(1 / 3, 1 / 3, 1 / (20 / 3)))
                         .times(Mat4.translation(-15.5, 4.4, 37)).times(Mat4.scale(1.2, 1.2, 1.2)), this.materials.nose_tile);
                 }
-                else{
+                else {
                     model_transform = Mat4.identity().times(Mat4.rotation(-rot, 0, 1, 0))
-                    model_transform = model_transform.times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2+t*4));
+                    model_transform = model_transform.times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2 + t * 4));
                     this.shapes.cat.draw_stand(context, program_state, model_transform,
                         cat_mat, cat_mat, cat_mat,
                         cat_mat, cat_mat, cat_mat);
@@ -981,17 +981,17 @@ export class Project extends Base_Scene {
                     .times(Mat4.translation(-15.5, 4.4, 37)).times(Mat4.scale(1.2, 1.2, 1.2)), this.materials.nose_tile);
             }
 
-            if(this.ball == false){
+            if (this.ball == false) {
                 this.bodies = []
             }
 
-            if(this.ball == false && this.cat_feed == false && this.brush_out == false){
+            if (this.ball == false && this.cat_feed == false && this.brush_out == false) {
                 program_state.animation_time = 0
             }
 
             this.happiness_level += 0.1;
             let scale_factor = 4 * this.happiness_level / 100; // Assuming happiness_level ranges from 0 to 100
-            let cube_transform = (Mat4.scale(1, scale_factor, 1))      // Scale only along the y-axis
+            let cube_transform = Mat4.translation(4, 0, 1).times(Mat4.scale(1, scale_factor, 1))      // Scale only along the y-axis
 
             let color_level;
             if (this.happiness_level <= 30) {
@@ -1001,7 +1001,7 @@ export class Project extends Base_Scene {
             } else if (this.happiness_level <= 110) {
                 color_level = this.materials.meter_green;
             }
-            let move_t = Mat4.translation(6, -6, -5);
+            let move_t = Mat4.translation(10, -6, -4);
             this.shapes.cube.draw(context, program_state, move_t.times(Mat4.scale(1.2, 1.2, 1.2)), this.materials.happy)
             this.shapes.cube.draw(context, program_state, Mat4.translation(6, -4.8, -5).times(cube_transform), color_level);
             this.updateHappinessLevel();
