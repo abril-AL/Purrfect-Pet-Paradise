@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d64af0eb-6f0e-4388-9019-859f828da9ec" name="Changes" comment="added couch, astronaut, alien to env">
+    <list default="true" id="d64af0eb-6f0e-4388-9019-859f828da9ec" name="Changes" comment="tail does not wag with unhappy brush">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/project.js" beforeDir="false" afterPath="$PROJECT_DIR$/project.js" afterDir="false" />
     </list>
@@ -22,12 +22,12 @@
     &quot;assignee&quot;: &quot;gjzev&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/abril-AL/Purrfect-Pet-Paradise.git",
-    "accountId": "383c807b-7664-4e7c-b716-ccbc3440090e"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/abril-AL/Purrfect-Pet-Paradise.git&quot;,
+    &quot;accountId&quot;: &quot;383c807b-7664-4e7c-b716-ccbc3440090e&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2
 }</component>
@@ -79,7 +79,8 @@
       <workItem from="1716863232781" duration="19000" />
       <workItem from="1716863262472" duration="7000" />
       <workItem from="1717366477252" duration="11727000" />
-      <workItem from="1717744561935" duration="3528000" />
+      <workItem from="1717744561935" duration="3612000" />
+      <workItem from="1717748591250" duration="1022000" />
     </task>
     <task id="LOCAL-00001" summary="Added Brush Class in project.js">
       <option name="closed" value="true" />
@@ -113,7 +114,15 @@
       <option name="project" value="LOCAL" />
       <updated>1717747375173</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="added unhappy brush">
+      <option name="closed" value="true" />
+      <created>1717748171717</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1717748171717</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -134,15 +143,16 @@
     <MESSAGE value="Added Brush Class in project.js" />
     <MESSAGE value="Brush now brushes cat" />
     <MESSAGE value="added couch, astronaut, alien to env" />
-    <option name="LAST_COMMIT_MESSAGE" value="added couch, astronaut, alien to env" />
+    <MESSAGE value="added unhappy brush" />
+    <MESSAGE value="tail does not wag with unhappy brush" />
+    <option name="LAST_COMMIT_MESSAGE" value="tail does not wag with unhappy brush" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/project.js</url>
-          <line>764</line>
-          <properties lambdaOrdinal="-1" />
+          <line>811</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

@@ -350,6 +350,53 @@ class Cat extends Shape {
         model_transform = model_transform;
     }
 
+    draw_unhappy_stand(context, program_state, model_transform, leg_material, body_material, head_material, mouth_material, ear_material, tail_material) {
+        model_transform = model_transform.times(Mat4.translation(-5, -5, -5));
+
+        // Legs
+        let leg_translation = 1.5;
+        let z_leg_separation = 9.5;
+
+        let front_left_leg_transform = model_transform.times(Mat4.translation(-leg_translation, 0, 2));
+        this.front_left_leg.draw(context, program_state, front_left_leg_transform, leg_material);
+
+        let front_right_leg_transform = model_transform.times(Mat4.translation(leg_translation, 0, 2));
+        this.front_right_leg.draw(context, program_state, front_right_leg_transform, leg_material);
+
+        let back_left_leg_transform = model_transform.times(Mat4.translation(-leg_translation, 0, -z_leg_separation));
+        this.back_left_leg.draw(context, program_state, back_left_leg_transform, leg_material);
+
+        let back_right_leg_transform = model_transform.times(Mat4.translation(leg_translation, 0, -z_leg_separation));
+        this.back_right_leg.draw(context, program_state, back_right_leg_transform, leg_material);
+
+        // Body
+        let body_transform = model_transform.times(Mat4.translation(0, 5, -3.5)); // Adjust the height as needed
+        this.body.draw(context, program_state, body_transform, body_material);
+
+        // Head
+        this.head.draw(context, program_state, model_transform.times(Mat4.translation(0, 7, 6.5)), head_material);
+        this.mouth.draw(context, program_state, model_transform.times(Mat4.translation(0, 6, 10)), mouth_material);
+
+        // Ears
+        this.right_ear.draw(context, program_state, model_transform.times(Mat4.translation(2, 9.5, 4.5)).times(Mat4.scale(1, 1, 2)), ear_material);
+        this.left_ear.draw(context, program_state, model_transform.times(Mat4.translation(-2, 9.5, 4.5)).times(Mat4.scale(1, 1, 2)), ear_material);
+
+        // Tail
+        let tail_transform = model_transform.times(Mat4.translation(0,8, -12.5));
+        for (let i = 0; i < 5; i++) {
+
+            this.tail_4.draw(context, program_state, tail_transform, tail_material);
+            let t2 = program_state.animation_time / 1000;
+            let w = 2*Math.PI/3;
+            let angle =  0.04 *Math.PI *Math.sin (w*t2);
+            tail_transform = tail_transform.times(Mat4.translation(0,1, 0));
+            //tail_transform = tail_transform.times(Mat4.translation(0,-1,0));
+           // tail_transform = tail_transform.times(Mat4.rotation(angle,0,0,1));
+            //tail_transform = tail_transform.times(Mat4.translation(0,1,0));
+        }
+        model_transform = Mat4.identity();
+    }
+
     draw_eating(context, program_state, model_transform, material, head_sin_transform) {
 
         model_transform = model_transform.times(Mat4.translation(-5, -5, -5));
@@ -1071,7 +1118,7 @@ export class Project extends Base_Scene {
                 t = program_state.animation_time / 1000
                 this.happy_i = 0.2;
                 model_transform = Mat4.identity().times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2));
-                this.shapes.cat.draw_stand(context, program_state, model_transform,
+                this.shapes.cat.draw_unhappy_stand(context, program_state, model_transform,
                     cat_mat, cat_mat, cat_mat,
                     cat_mat, cat_mat, cat_mat);//fix paramaters later
                 //eyes
