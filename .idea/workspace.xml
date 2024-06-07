@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d64af0eb-6f0e-4388-9019-859f828da9ec" name="Changes" comment="Brush now brushes cat">
+    <list default="true" id="d64af0eb-6f0e-4388-9019-859f828da9ec" name="Changes" comment="added flowers to outside">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/project.js" beforeDir="false" afterPath="$PROJECT_DIR$/project.js" afterDir="false" />
     </list>
@@ -22,12 +22,12 @@
     &quot;assignee&quot;: &quot;gjzev&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/abril-AL/Purrfect-Pet-Paradise.git&quot;,
-    &quot;accountId&quot;: &quot;67e18bb7-fef8-44d5-8d1d-78216535f159&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/abril-AL/Purrfect-Pet-Paradise.git",
+    "accountId": "383c807b-7664-4e7c-b716-ccbc3440090e"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2
 }</component>
@@ -54,13 +54,14 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/assets" />
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-WS-241.14494.235" />
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-WS-241.17011.90" />
       </set>
     </attachedChunks>
   </component>
@@ -78,6 +79,7 @@
       <workItem from="1716863232781" duration="19000" />
       <workItem from="1716863262472" duration="7000" />
       <workItem from="1717366477252" duration="11727000" />
+      <workItem from="1717744561935" duration="2763000" />
     </task>
     <task id="LOCAL-00001" summary="Added Brush Class in project.js">
       <option name="closed" value="true" />

@@ -1,4 +1,3 @@
-
 import { defs, tiny, Torus } from './examples/common.js';
 
 const {
@@ -708,6 +707,7 @@ class Base_Scene extends Scene {
             sphere: new defs.Subdivision_Sphere(4),
             'brush': new Brush(),
             'bowl': new Bowl(),
+            'unhappy_brush': new Brush(),
         };
 
         Object.assign(this, { time_accumulator: 0, time_scale: 1, t: 0, dt: 1 / 20, bodies: [], steps_taken: 0 });
@@ -757,6 +757,8 @@ class Base_Scene extends Scene {
                 { ambient: 1, texture: new Texture("assets/upset.png") }),
             test: new Material(new defs.Phong_Shader(),
                 { ambient: 1, diffusivity: .6, color: hex_color("#41004d") }),
+            test2: new Material(new defs.Phong_Shader(),
+                { ambient: 1, diffusivity: .6, color: hex_color("#39FF14") }),
             plastic: new Material(new defs.Phong_Shader(),
                 { ambient: .4, diffusivity: .6, color: hex_color("#ffffff") }),
             kibble: new Material(textured,
@@ -785,6 +787,9 @@ class Base_Scene extends Scene {
                 { ambient: .8, diffusivity: .4, specularity: 0.4, texture: new Texture("assets/floor.jpg") }),
             painting: new Material(bump,
                 { ambient: .8, diffusivity: .4, specularity: 0.4, texture: new Texture("assets/painting.jpg") }),
+            couch: new Material(bump,
+                { ambient: .8, diffusivity: .4, specularity: 0.4, texture: new Texture("assets/couch.png") }),
+
 
             // Space Environment
             star_bk: new Material(bump,
@@ -793,10 +798,16 @@ class Base_Scene extends Scene {
                 { ambient: 1, texture: new Texture("assets/moon.jpg") }),
             earth: new Material(textured,
                 { ambient: 1, texture: new Texture("assets/earth.png") }),
+            alien: new Material(bump,
+                { ambient: .8, diffusivity: .4, specularity: 0.4, texture: new Texture("assets/alien.png") }),
+            astro: new Material(bump,
+                { ambient: .8, diffusivity: .4, specularity: 0.4, texture: new Texture("assets/astro.png") }),
+
         };
 
         this.cat_sit = false;
         this.brush_out = false;
+        this.unhappy_brush_out = false;
         this.ball = false;
 
         this.cat_color_set = ['b', 'g', 'w', 'o',];
@@ -900,13 +911,23 @@ export class Project extends Base_Scene {
             this.brush_out = !this.brush_out;
             this.cat_feed = false;
             this.ball = false;
+            this.unhappy_brush_out = false;
             this.happiness_level += 0.5;
+        });
+        this.new_line();
+        this.key_triggered_button("Change Brush", ["u"], () => {
+            this.unhappy_brush_out = !this.unhappy_brush_out;
+            this.cat_feed = false;
+            this.ball = false;
+            this.brush_out = false;
+            this.happiness_level -= 0.5;
         });
         this.new_line();
         this.key_triggered_button("Feed", ["h"], () => {
             this.cat_feed = !this.cat_feed;
             this.brush_out = false;
             this.ball = false;
+            this.unhappy_brush_out = false;
             this.happiness_level += 0.5;
         });
         this.new_line();
@@ -927,6 +948,7 @@ export class Project extends Base_Scene {
             this.ball = !this.ball;
             this.brush_out = false;
             this.cat_feed = false;
+            this.unhappy_brush_out = false;
             this.happiness_level += 0.5
         });
     }
@@ -1045,6 +1067,29 @@ export class Project extends Base_Scene {
                 model_transform = Mat4.identity();
                 this.shapes.cube_tile.draw(context, program_state, model_transform.times(Mat4.scale(1 / 2, 1 / 2, 0)).times(Mat4.translation(-9, -2, 3)), this.materials.heart);
 
+            } else if (this.unhappy_brush_out == true) {
+                t = program_state.animation_time / 1000
+                this.happy_i = 0.2;
+                model_transform = Mat4.identity().times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2));
+                this.shapes.cat.draw_stand(context, program_state, model_transform,
+                    cat_mat, cat_mat, cat_mat,
+                    cat_mat, cat_mat, cat_mat);//fix paramaters later
+                //eyes
+                this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(2.2, 2, 0.1))
+                    .times(Mat4.translation(-2.3, 1, 45)), eye_texture);
+                //nose
+                this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(1 / 3, 1 / 3, 1 / (20 / 3)))
+                    .times(Mat4.translation(-15.5, 4.4, 37)).times(Mat4.scale(1.2, 1.2, 1.2)), this.materials.nose_tile);
+
+                model_transform = model_transform.times(Mat4.translation(-5, 4, -10))
+                    .times(Mat4.rotation(Math.PI / 2, 1, 0, 0));
+                let unhappy_brush_transform = model_transform.copy()
+                unhappy_brush_transform = unhappy_brush_transform.times(Mat4.translation(0, 5 * Math.cos(t), 0));
+                this.shapes.brush.draw_brush(context, program_state, unhappy_brush_transform, this.materials.test2);
+
+                //happy cat
+                model_transform = Mat4.identity();
+                this.shapes.cube_tile.draw(context, program_state, model_transform.times(Mat4.scale(1 / 2, 1 / 2, 0)).times(Mat4.translation(-9, -2, 3)), this.materials.heart);
             } else if (this.cat_feed == true) {
                 t = program_state.animation_time / 1000
                 this.happy_i = -0.1;
@@ -1127,7 +1172,7 @@ export class Project extends Base_Scene {
                 this.bodies = []
             }
 
-            if (this.ball == false && this.cat_feed == false && this.brush_out == false) {
+            if (this.ball == false && this.cat_feed == false && this.brush_out == false  && this.unhappy_brush_out == false) {
                 program_state.animation_time = 0
             }
 
@@ -1258,8 +1303,21 @@ export class Project extends Base_Scene {
             model_transform = Mat4.identity()
             this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-12, 10, -29)).times(Mat4.scale(5, 5, 1)), this.materials.test.override({ color: hex_color("#6B2503") }));
             this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-12, 10, -28.3)).times(Mat4.scale(4.2, 4.2, 1)), this.materials.painting);
+
+            // Couch
+            model_transform = Mat4.identity()
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-28, -.2, -29)).times(Mat4.scale(14, 14, 0.01)), this.materials.couch);
+
         }
         else if (this.envr == 'space') {
+            // Alien
+            model_transform = Mat4.identity()
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(30, -1.5, -29)).times(Mat4.scale(6, 6, 0.01)), this.materials.alien);
+
+            // Astronaut
+            model_transform = Mat4.identity()
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-30, 3, -29)).times(Mat4.scale(6, 6, 0.01)), this.materials.astro);
+
             // Back Walls
             model_transform = Mat4.identity().times(Mat4.translation(-40, 3, 20))
 
@@ -1286,7 +1344,7 @@ export class Project extends Base_Scene {
             let earth_transform = model_transform.times(Mat4.rotation(-t / 40, 0, 0, 1));
             earth_transform = earth_transform.times(Mat4.scale(2, 2, 2)).times(Mat4.translation(-10, 5, -12)); // Translate to the desired point
             this.shapes.sphere.draw(context, program_state, earth_transform, this.materials.earth);
+
         }
     }
 }
-
