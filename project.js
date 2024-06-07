@@ -409,6 +409,145 @@ class Cat extends Shape {
 
 }
 
+class CatRun extends Shape {
+    constructor() {
+        super("position", "normal");
+
+        // Legs
+        this.front_left_leg = new Leg();
+        this.front_right_leg = new Leg();
+        this.back_left_leg = new Leg();
+        this.back_right_leg = new Leg();
+
+        // Body
+        this.body = new Body();
+
+        // Head
+        this.head = new Head();
+        this.mouth = new Mouth();
+        this.right_ear = new small_Cube();
+        this.left_ear = new small_Cube();
+
+        // Tail - 4 parts
+        this.tail_1 = new small_Cube();
+        this.tail_2 = new small_Cube();
+        this.tail_3 = new small_Cube();
+        this.tail_4 = new small_Cube();
+    }
+
+    draw_stand(context, program_state, model_transform, leg_material, body_material, head_material, mouth_material, ear_material, tail_material) {
+        model_transform = model_transform.times(Mat4.translation(-5, -5, -5));
+
+        // Legs
+        let leg_translation = 1.5;
+        let z_leg_separation = 9.5;
+
+        let front_left_leg_transform = model_transform.times(Mat4.translation(-leg_translation, 0, 2))
+            .times(Mat4.rotation(0.5*Math.sin(program_state.animation_time/500), 1, 0, 0));
+        this.front_left_leg.draw(context, program_state, front_left_leg_transform, leg_material);
+
+        let front_right_leg_transform = model_transform.times(Mat4.translation(leg_translation, 0, 2))
+            .times(Mat4.rotation(-0.5*Math.sin(program_state.animation_time/500), 1, 0, 0));
+        this.front_right_leg.draw(context, program_state, front_right_leg_transform, leg_material);
+
+        let back_left_leg_transform = model_transform.times(Mat4.translation(-leg_translation, 0, -z_leg_separation))
+            .times(Mat4.rotation(0.5*Math.sin(program_state.animation_time/500), 1, 0, 0));
+        this.back_left_leg.draw(context, program_state, back_left_leg_transform, leg_material);
+
+        let back_right_leg_transform = model_transform.times(Mat4.translation(leg_translation, 0, -z_leg_separation))
+            .times(Mat4.rotation(-0.5*Math.sin(program_state.animation_time/500), 1, 0, 0));
+        this.back_right_leg.draw(context, program_state, back_right_leg_transform, leg_material);
+
+        // Body
+        let body_transform = model_transform.times(Mat4.translation(0, 5, -3.5)); // Adjust the height as needed
+        this.body.draw(context, program_state, body_transform, body_material);
+
+        // Head
+        this.head.draw(context, program_state, model_transform.times(Mat4.translation(0, 7, 6.5)), head_material);
+        this.mouth.draw(context, program_state, model_transform.times(Mat4.translation(0, 6, 10)), mouth_material);
+
+        // Ears
+        this.right_ear.draw(context, program_state, model_transform.times(Mat4.translation(2, 9.5, 4.5)).times(Mat4.scale(1, 1, 2)), ear_material);
+        this.left_ear.draw(context, program_state, model_transform.times(Mat4.translation(-2, 9.5, 4.5)).times(Mat4.scale(1, 1, 2)), ear_material);
+
+        // Tail
+        let tail_transform = model_transform.times(Mat4.translation(0,8, -12.5));
+        for (let i = 0; i < 5; i++) {
+
+            this.tail_4.draw(context, program_state, tail_transform, tail_material);
+            let t2 = program_state.animation_time / 1000;
+            let w = 2*Math.PI/3;
+            let angle =  0.04 *Math.PI *Math.sin (w*t2);
+            tail_transform = tail_transform.times(Mat4.translation(0,1, 0));
+            tail_transform = tail_transform.times(Mat4.translation(0,-1,0));
+            tail_transform = tail_transform.times(Mat4.rotation(angle,0,0,1));
+            tail_transform = tail_transform.times(Mat4.translation(0,1,0));
+        }
+        model_transform = Mat4.identity();
+    }
+
+    draw_sit(context, program_state, model_transform, materials) {
+        model_transform = model_transform;
+    }
+
+    draw_eating(context, program_state, model_transform, material, head_sin_transform) {
+
+        model_transform = model_transform.times(Mat4.translation(-5, -5, -5));
+        head_sin_transform = head_sin_transform.times(Mat4.translation(0, -2, 0));
+
+        // Legs
+        let leg_translation = 1.5;
+        let z_leg_separation = 9.5;
+
+        let front_left_leg_transform = model_transform.times(Mat4.translation(-leg_translation, 0, 2));
+        this.front_left_leg.draw(context, program_state, front_left_leg_transform, material);
+
+        let front_right_leg_transform = model_transform.times(Mat4.translation(leg_translation, 0, 2));
+        this.front_right_leg.draw(context, program_state, front_right_leg_transform, material);
+
+        let back_left_leg_transform = model_transform.times(Mat4.translation(-leg_translation, 0, -z_leg_separation));
+        this.back_left_leg.draw(context, program_state, back_left_leg_transform, material);
+
+        let back_right_leg_transform = model_transform.times(Mat4.translation(leg_translation, 0, -z_leg_separation));
+        this.back_right_leg.draw(context, program_state, back_right_leg_transform, material);
+
+        // Tail
+        let tail_transform2 = model_transform.times(Mat4.translation(0,8, -12.5));
+        for (let i = 0; i < 5; i++) {
+
+            this.tail_4.draw(context, program_state, tail_transform2, material);
+            let t3 = program_state.animation_time / 1000;
+            let w3 = 2*Math.PI/3;
+            let angle =  0.04 *Math.PI *Math.sin (w3*t3);
+            tail_transform2 = tail_transform2.times(Mat4.translation(0,1, 0));
+            tail_transform2 = tail_transform2.times(Mat4.translation(0,-1,0));
+            tail_transform2 = tail_transform2.times(Mat4.rotation(angle,0,0,1));
+            tail_transform2 = tail_transform2.times(Mat4.translation(0,1,0));
+        }
+
+        // Body
+        let body_transform = model_transform
+            .times(Mat4.translation(0, 5, -3.5))  // Move to the hinge point
+            .times(Mat4.rotation(2 * Math.PI / 180, 1, 0, 0))  // Rotate the body downwards
+            .times(Mat4.translation(0, -5, 3.5))  // Move back to the original position
+            .times(Mat4.translation(0, 4.3, -3));  // Offset for body height
+        this.body.draw(context, program_state, body_transform, material);
+
+
+        // These Will Tilt to Simulate Eating:
+        // Head
+        this.head.draw(context, program_state, head_sin_transform.times(Mat4.translation(0, 7, 6.5)).times(Mat4.translation(-5, -5, -5)), material);
+        this.mouth.draw(context, program_state, head_sin_transform.times(Mat4.translation(0, 6, 10)).times(Mat4.translation(-5, -5, -5)), material);
+        // Ears
+        this.right_ear.draw(context, program_state, head_sin_transform.times(Mat4.translation(2, 9.5, 4.5)).times(Mat4.translation(-5, -5, -5)).times(Mat4.scale(1, 1, 2)), material);
+        this.left_ear.draw(context, program_state, head_sin_transform.times(Mat4.translation(-2, 9.5, 4.5)).times(Mat4.translation(-5, -5, -5)).times(Mat4.scale(1, 1, 2)), material);
+
+
+        model_transform = Mat4.identity();
+    }
+
+}
+
 class Brush extends Shape {
     constructor() {
         super("position", "normal");
@@ -563,6 +702,7 @@ class Base_Scene extends Scene {
         this.shapes = {
             'cube': new Cube(),
             'cat': new Cat(),
+            'cat_run': new CatRun(),
             sq_tile: new defs.Square(),
             cube_tile: new defs.Cube(),
             sphere: new defs.Subdivision_Sphere(4),
@@ -940,14 +1080,14 @@ export class Project extends Base_Scene {
 
                 model_transform = Mat4.identity();
             } else if (this.ball) {
-                t = program_state.animation_time / 1000
+                t = program_state.animation_time / 500
                 this.happy_i -= 0.1;
                 let rot = Math.atan(Math.sqrt(Math.pow(this.bodies[0].center[0], 2)) / Math.sqrt(Math.pow(this.bodies[0].center[2], 2)));
 
                 if (this.direction == 0) {
                     model_transform = Mat4.identity().times(Mat4.rotation(rot, 0, 1, 0))
                     model_transform = model_transform.times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2 + t * 4));
-                    this.shapes.cat.draw_stand(context, program_state, model_transform,
+                    this.shapes.cat_run.draw_stand(context, program_state, model_transform,
                         cat_mat, cat_mat, cat_mat,
                         cat_mat, cat_mat, cat_mat);
                     this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(2.2, 2, 0.1))
@@ -958,7 +1098,7 @@ export class Project extends Base_Scene {
                 else {
                     model_transform = Mat4.identity().times(Mat4.rotation(-rot, 0, 1, 0))
                     model_transform = model_transform.times(Mat4.scale(1 / 2, 1 / 2, 1 / 2)).times(Mat4.translation(0, -7, -2 + t * 4));
-                    this.shapes.cat.draw_stand(context, program_state, model_transform,
+                    this.shapes.cat_run.draw_stand(context, program_state, model_transform,
                         cat_mat, cat_mat, cat_mat,
                         cat_mat, cat_mat, cat_mat);
                     this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.scale(2.2, 2, 0.1))
