@@ -587,6 +587,8 @@ class Base_Scene extends Scene {
                 { ambient: 1, texture: new Texture("assets/sun_softer.png") }),
             fence: new Material(bump,
                 { ambient: 1, texture: new Texture("assets/fence.png") }),
+            flower: new Material(bump,
+                { ambient: .8, diffusivity: .4, specularity: 0.4, texture: new Texture("assets/flower.png") }),
 
             // Cat Textures
             cat_black: new Material(new defs.Phong_Shader(),
@@ -1054,6 +1056,37 @@ export class Project extends Base_Scene {
                 model_transform = model_transform.times(Mat4.translation((i * 5) - 60, -4, -20)).times(Mat4.scale(3, 3, 0));
                 this.shapes.cube_tile.draw(context, program_state, model_transform, this.materials.fence);
             }
+
+            // Flowers
+
+            model_transform = Mat4.identity();
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(29, -5, -19)).times(Mat4.scale(2, 2, 0.01)), this.materials.flower);
+            model_transform = Mat4.identity();
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(24, -5, -19)).times(Mat4.scale(2, 2, 0.01)), this.materials.flower);
+            model_transform = Mat4.identity();
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(19, -5, -19)).times(Mat4.scale(2, 2, 0.01)), this.materials.flower);
+            model_transform = Mat4.identity();
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(14, -5, -19)).times(Mat4.scale(2, 2, 0.01)), this.materials.flower);
+            model_transform = Mat4.identity();
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(9, -5, -19)).times(Mat4.scale(2, 2, 0.01)), this.materials.flower);
+            model_transform = Mat4.identity();
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(4, -5, -19)).times(Mat4.scale(2, 2, 0.01)), this.materials.flower);
+            model_transform = Mat4.identity();
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-1, -5, -19)).times(Mat4.scale(2, 2, 0.01)), this.materials.flower);
+            model_transform = Mat4.identity();
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-6, -5, -19)).times(Mat4.scale(2, 2, 0.01)), this.materials.flower);
+            model_transform = Mat4.identity();
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-11, -5, -19)).times(Mat4.scale(2, 2, 0.01)), this.materials.flower);
+            model_transform = Mat4.identity();
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-16, -5, -19)).times(Mat4.scale(2, 2, 0.01)), this.materials.flower);
+            model_transform = Mat4.identity();
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-21, -5, -19)).times(Mat4.scale(2, 2, 0.01)), this.materials.flower);
+            model_transform = Mat4.identity();
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-26, -5, -19)).times(Mat4.scale(2, 2, 0.01)), this.materials.flower);
+            model_transform = Mat4.identity();
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-31, -5, -19)).times(Mat4.scale(2, 2, 0.01)), this.materials.flower);
+            model_transform = Mat4.identity();
+            this.shapes.cube.draw(context, program_state, model_transform.times(Mat4.translation(-36, -5, -19)).times(Mat4.scale(2, 2, 0.01)), this.materials.flower);
         }
         else if (this.envr == 'inside') {
             // Back Walls
