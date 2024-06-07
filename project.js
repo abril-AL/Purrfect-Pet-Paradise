@@ -758,7 +758,7 @@ class Base_Scene extends Scene {
             test: new Material(new defs.Phong_Shader(),
                 { ambient: 1, diffusivity: .6, color: hex_color("#41004d") }),
             test2: new Material(new defs.Phong_Shader(),
-                { ambient: 1, diffusivity: .6, color: hex_color("#39FF14") }),
+                { ambient: 1, diffusivity: .6, color: hex_color("#ffc0cB") }),
             plastic: new Material(new defs.Phong_Shader(),
                 { ambient: .4, diffusivity: .6, color: hex_color("#ffffff") }),
             kibble: new Material(textured,
@@ -1087,9 +1087,9 @@ export class Project extends Base_Scene {
                 unhappy_brush_transform = unhappy_brush_transform.times(Mat4.translation(0, 5 * Math.cos(t), 0));
                 this.shapes.brush.draw_brush(context, program_state, unhappy_brush_transform, this.materials.test2);
 
-                //happy cat
+                //unhappy cat
                 model_transform = Mat4.identity();
-                this.shapes.cube_tile.draw(context, program_state, model_transform.times(Mat4.scale(1 / 2, 1 / 2, 0)).times(Mat4.translation(-9, -2, 3)), this.materials.heart);
+                this.shapes.cube_tile.draw(context, program_state, model_transform.times(Mat4.scale(1 / 2, 1 / 2, 0)).times(Mat4.translation(-1, -2, 3)), this.materials.upset);
             } else if (this.cat_feed == true) {
                 t = program_state.animation_time / 1000
                 this.happy_i = -0.1;

@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d64af0eb-6f0e-4388-9019-859f828da9ec" name="Changes" comment="added flowers to outside">
+    <list default="true" id="d64af0eb-6f0e-4388-9019-859f828da9ec" name="Changes" comment="added couch, astronaut, alien to env">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/project.js" beforeDir="false" afterPath="$PROJECT_DIR$/project.js" afterDir="false" />
     </list>
@@ -79,7 +79,7 @@
       <workItem from="1716863232781" duration="19000" />
       <workItem from="1716863262472" duration="7000" />
       <workItem from="1717366477252" duration="11727000" />
-      <workItem from="1717744561935" duration="2763000" />
+      <workItem from="1717744561935" duration="3528000" />
     </task>
     <task id="LOCAL-00001" summary="Added Brush Class in project.js">
       <option name="closed" value="true" />
@@ -105,7 +105,15 @@
       <option name="project" value="LOCAL" />
       <updated>1716523889708</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="added couch, astronaut, alien to env">
+      <option name="closed" value="true" />
+      <created>1717747375173</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1717747375173</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -125,6 +133,19 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Added Brush Class in project.js" />
     <MESSAGE value="Brush now brushes cat" />
-    <option name="LAST_COMMIT_MESSAGE" value="Brush now brushes cat" />
+    <MESSAGE value="added couch, astronaut, alien to env" />
+    <option name="LAST_COMMIT_MESSAGE" value="added couch, astronaut, alien to env" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/project.js</url>
+          <line>764</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
